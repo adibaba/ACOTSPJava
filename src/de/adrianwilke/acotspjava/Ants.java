@@ -59,7 +59,7 @@ public class Ants {
     public static final int MAX_ANTS = 1024;
     public static final int MAX_NEIGHBOURS = 512;
 
-    static ant_struct ant_colony[];
+    static ant_struct ant[];
     static ant_struct best_so_far_ant;
     static ant_struct restart_best_ant;
 
@@ -68,7 +68,7 @@ public class Ants {
 
     static double prob_of_selection[];
 
-    static int number_of_ants; /* number of ants */
+    static int n_ants; /* number of ants */
     static int nn_ants; /*
 			 * length of nearest neighbor lists for the ants'
 			 * solution construction
@@ -120,22 +120,22 @@ public class Ants {
     {
 	int i;
 
-	ant_colony = new ant_struct[number_of_ants];
+	ant = new ant_struct[n_ants];
 
-	for (i = 0; i < number_of_ants; i++) {
-	    ant_colony[i] = new ant_struct();
-	    ant_colony[i].tour = new int[Tsp.number_of_cities + 1];
-	    ant_colony[i].visited = new boolean[Tsp.number_of_cities];
+	for (i = 0; i < n_ants; i++) {
+	    ant[i] = new ant_struct();
+	    ant[i].tour = new int[Tsp.n + 1];
+	    ant[i].visited = new boolean[Tsp.n];
 	}
 	best_so_far_ant = new ant_struct();
 
-	best_so_far_ant.tour = new int[Tsp.number_of_cities + 1];
-	best_so_far_ant.visited = new boolean[Tsp.number_of_cities];
+	best_so_far_ant.tour = new int[Tsp.n + 1];
+	best_so_far_ant.visited = new boolean[Tsp.n];
 
 	restart_best_ant = new ant_struct();
 
-	restart_best_ant.tour = new int[Tsp.number_of_cities + 1];
-	restart_best_ant.visited = new boolean[Tsp.number_of_cities];
+	restart_best_ant.tour = new int[Tsp.n + 1];
+	restart_best_ant.visited = new boolean[Tsp.n];
 
 	prob_of_selection = new double[nn_ants + 1];
 	for (i = 0; i < nn_ants + 1; i++) {
@@ -154,11 +154,11 @@ public class Ants {
 	int min;
 	int k, k_min;
 
-	min = ant_colony[0].tour_length;
+	min = ant[0].tour_length;
 	k_min = 0;
-	for (k = 1; k < number_of_ants; k++) {
-	    if (ant_colony[k].tour_length < min) {
-		min = ant_colony[k].tour_length;
+	for (k = 1; k < n_ants; k++) {
+	    if (ant[k].tour_length < min) {
+		min = ant[k].tour_length;
 		k_min = k;
 	    }
 	}
@@ -176,11 +176,11 @@ public class Ants {
 	int max;
 	int k, k_max;
 
-	max = ant_colony[0].tour_length;
+	max = ant[0].tour_length;
 	k_max = 0;
-	for (k = 1; k < number_of_ants; k++) {
-	    if (ant_colony[k].tour_length > max) {
-		max = ant_colony[k].tour_length;
+	for (k = 1; k < n_ants; k++) {
+	    if (ant[k].tour_length > max) {
+		max = ant[k].tour_length;
 		k_max = k;
 	    }
 	}
@@ -206,7 +206,7 @@ public class Ants {
 	// TRACE ( System.out.println(" init trails with %.15f\n",initial_trail); );
 
 	/* Initialize pheromone trails */
-	for (i = 0; i < Tsp.number_of_cities; i++) {
+	for (i = 0; i < Tsp.n; i++) {
 	    for (j = 0; j <= i; j++) {
 		pheromone[i][j] = initial_trail;
 		pheromone[j][i] = initial_trail;
@@ -228,7 +228,7 @@ public class Ants {
 
 	// TRACE ( System.out.println("pheromone evaporation\n"); );
 
-	for (i = 0; i < Tsp.number_of_cities; i++) {
+	for (i = 0; i < Tsp.n; i++) {
 	    for (j = 0; j <= i; j++) {
 		pheromone[i][j] = (1 - rho) * pheromone[i][j];
 		pheromone[j][i] = pheromone[i][j];
@@ -251,7 +251,7 @@ public class Ants {
 
 	// TRACE ( System.out.println("pheromone evaporation nn_list\n"); );
 
-	for (i = 0; i < Tsp.number_of_cities; i++) {
+	for (i = 0; i < Tsp.n; i++) {
 	    for (j = 0; j < nn_ants; j++) {
 		help_city = Tsp.instance.nn_list[i][j];
 		pheromone[i][help_city] = (1 - rho) * pheromone[i][help_city];
@@ -273,7 +273,7 @@ public class Ants {
 	// TRACE ( System.out.println("global pheromone update\n"); );
 
 	d_tau = 1.0 / (double) a.tour_length;
-	for (i = 0; i < Tsp.number_of_cities; i++) {
+	for (i = 0; i < Tsp.n; i++) {
 	    j = a.tour[i];
 	    h = a.tour[i + 1];
 	    pheromone[j][h] += d_tau;
@@ -295,7 +295,7 @@ public class Ants {
 	// TRACE ( System.out.println("global pheromone update weighted\n"); );
 
 	d_tau = (double) weight / (double) a.tour_length;
-	for (i = 0; i < Tsp.number_of_cities; i++) {
+	for (i = 0; i < Tsp.n; i++) {
 	    j = a.tour[i];
 	    h = a.tour[i + 1];
 	    pheromone[j][h] += d_tau;
@@ -314,7 +314,7 @@ public class Ants {
 
 	// TRACE ( System.out.println("compute total information\n"); );
 
-	for (i = 0; i < Tsp.number_of_cities; i++) {
+	for (i = 0; i < Tsp.n; i++) {
 	    for (j = 0; j < i; j++) {
 		total[i][j] = Math.pow(pheromone[i][j], alpha) * Math.pow(HEURISTIC(i, j), beta);
 		total[j][i] = total[i][j];
@@ -333,7 +333,7 @@ public class Ants {
 
 	// TRACE ( System.out.println("compute total information nn_list\n"); );
 
-	for (i = 0; i < Tsp.number_of_cities; i++) {
+	for (i = 0; i < Tsp.n; i++) {
 	    for (j = 0; j < nn_ants; j++) {
 		h = Tsp.instance.nn_list[i][j];
 		if (pheromone[i][h] < pheromone[h][i])
@@ -361,7 +361,7 @@ public class Ants {
     {
 	int i;
 
-	for (i = 0; i < Tsp.number_of_cities; i++) {
+	for (i = 0; i < Tsp.n; i++) {
 	    a.visited[i] = false;
 	}
     }
@@ -376,7 +376,7 @@ public class Ants {
     {
 	int rnd;
 
-	rnd = (int) (Utilities.ran01(Utilities.seed) * (double) Tsp.number_of_cities); /* random number between 0 .. n-1 */
+	rnd = (int) (Utilities.ran01(Utilities.seed) * (double) Tsp.n); /* random number between 0 .. n-1 */
 
 	a.tour[step] = rnd;
 	a.visited[rnd] = true;
@@ -394,11 +394,11 @@ public class Ants {
 	int city, current_city, next_city;
 	double value_best;
 
-	next_city = Tsp.number_of_cities;
-	assert (phase > 0 && phase < Tsp.number_of_cities);
+	next_city = Tsp.n;
+	assert (phase > 0 && phase < Tsp.n);
 	current_city = a.tour[phase - 1];
 	value_best = -1.; /* values in total matrix are always >= 0.0 */
-	for (city = 0; city < Tsp.number_of_cities; city++) {
+	for (city = 0; city < Tsp.n; city++) {
 	    if (a.visited[city])
 		; /* city already visited, do nothing */
 	    else {
@@ -408,7 +408,7 @@ public class Ants {
 		}
 	    }
 	}
-	assert (0 <= next_city && next_city < Tsp.number_of_cities);
+	assert (0 <= next_city && next_city < Tsp.n);
 	assert (value_best > 0.0);
 	assert (a.visited[next_city] == false);
 	a.tour[phase] = next_city;
@@ -427,10 +427,10 @@ public class Ants {
 	int i, current_city, next_city, help_city;
 	double value_best, help;
 
-	next_city = Tsp.number_of_cities;
-	assert (phase > 0 && phase < Tsp.number_of_cities);
+	next_city = Tsp.n;
+	assert (phase > 0 && phase < Tsp.n);
 	current_city = a.tour[phase - 1];
-	assert (0 <= current_city && current_city < Tsp.number_of_cities);
+	assert (0 <= current_city && current_city < Tsp.n);
 	value_best = -1.; /* values in total matix are always >= 0.0 */
 	for (i = 0; i < nn_ants; i++) {
 	    help_city = Tsp.instance.nn_list[current_city][i];
@@ -444,11 +444,11 @@ public class Ants {
 		}
 	    }
 	}
-	if (next_city == Tsp.number_of_cities)
+	if (next_city == Tsp.n)
 	    /* all cities in nearest neighbor list were already visited */
 	    choose_best_next(a, phase);
 	else {
-	    assert (0 <= next_city && next_city < Tsp.number_of_cities);
+	    assert (0 <= next_city && next_city < Tsp.n);
 	    assert (value_best > 0.0);
 	    assert (a.visited[next_city] == false);
 	    a.tour[phase] = next_city;
@@ -466,11 +466,11 @@ public class Ants {
     {
 	int city, current_city, next_city, min_distance;
 
-	next_city = Tsp.number_of_cities;
-	assert (phase > 0 && phase < Tsp.number_of_cities);
+	next_city = Tsp.n;
+	assert (phase > 0 && phase < Tsp.n);
 	current_city = a.tour[phase - 1];
 	min_distance = Integer.MAX_VALUE; /* Search shortest edge */
-	for (city = 0; city < Tsp.number_of_cities; city++) {
+	for (city = 0; city < Tsp.n; city++) {
 	    if (a.visited[city])
 		; /* city already visited */
 	    else {
@@ -480,7 +480,7 @@ public class Ants {
 		}
 	    }
 	}
-	assert (0 <= next_city && next_city < Tsp.number_of_cities);
+	assert (0 <= next_city && next_city < Tsp.n);
 	a.tour[phase] = next_city;
 	a.visited[next_city] = true;
     }
@@ -521,12 +521,12 @@ public class Ants {
 	prob_ptr = prob_of_selection;
 
 	current_city = a.tour[phase - 1]; /* current_city city of ant k */
-	assert (current_city >= 0 && current_city < Tsp.number_of_cities);
+	assert (current_city >= 0 && current_city < Tsp.n);
 	for (i = 0; i < nn_ants; i++) {
 	    if (a.visited[Tsp.instance.nn_list[current_city][i]])
 		prob_ptr[i] = 0.0; /* city already visited */
 	    else {
-		assert (Tsp.instance.nn_list[current_city][i] >= 0 && Tsp.instance.nn_list[current_city][i] < Tsp.number_of_cities);
+		assert (Tsp.instance.nn_list[current_city][i] >= 0 && Tsp.instance.nn_list[current_city][i] < Tsp.n);
 		prob_ptr[i] = total[current_city][Tsp.instance.nn_list[current_city][i]];
 		sum_prob += prob_ptr[i];
 	    }
@@ -560,7 +560,7 @@ public class Ants {
 	    assert (0 <= i && i < nn_ants);
 	    assert (prob_ptr[i] >= 0.0);
 	    help = Tsp.instance.nn_list[current_city][i];
-	    assert (help >= 0 && help < Tsp.number_of_cities);
+	    assert (help >= 0 && help < Tsp.n);
 	    assert (a.visited[help] == false);
 	    a.tour[phase] = help; /* Tsp.instance.nn_list[current_city][i]; */
 	    a.visited[help] = true;
@@ -588,7 +588,7 @@ public class Ants {
 
 	// TRACE ( System.out.println("mmas specific evaporation on nn_lists\n"); );
 
-	for (i = 0; i < Tsp.number_of_cities; i++) {
+	for (i = 0; i < Tsp.n; i++) {
 	    for (j = 0; j < nn_ants; j++) {
 		help_city = Tsp.instance.nn_list[i][j];
 		pheromone[i][help_city] = (1 - rho) * pheromone[i][help_city];
@@ -611,7 +611,7 @@ public class Ants {
 
 	// TRACE ( System.out.println("mmas specific: check pheromone trail limits\n"); );
 
-	for (i = 0; i < Tsp.number_of_cities; i++) {
+	for (i = 0; i < Tsp.n; i++) {
 	    for (j = 0; j < i; j++) {
 		if (pheromone[i][j] < trail_min) {
 		    pheromone[i][j] = trail_min;
@@ -640,7 +640,7 @@ public class Ants {
 
 	// TRACE ( System.out.println("mmas specific: check pheromone trail limits nn_list\n"); );
 
-	for (i = 0; i < Tsp.number_of_cities; i++) {
+	for (i = 0; i < Tsp.n; i++) {
 	    for (j = 0; j < nn_ants; j++) {
 		help_city = Tsp.instance.nn_list[i][j];
 		if (pheromone[i][help_city] < trail_min)
@@ -672,7 +672,7 @@ public class Ants {
 
 	d_tau = 1.0 / (double) a.tour_length;
 
-	for (i = 0; i < Tsp.number_of_cities; i++) {
+	for (i = 0; i < Tsp.n; i++) {
 	    j = a.tour[i];
 	    h = a.tour[i + 1];
 
@@ -699,12 +699,12 @@ public class Ants {
     {
 	int h, j;
 
-	assert (phase > 0 && phase <= Tsp.number_of_cities);
+	assert (phase > 0 && phase <= Tsp.n);
 	j = a.tour[phase];
 
 	h = a.tour[phase - 1];
-	assert (0 <= j && j < Tsp.number_of_cities);
-	assert (0 <= h && h < Tsp.number_of_cities);
+	assert (0 <= j && j < Tsp.n);
+	assert (0 <= h && h < Tsp.n);
 	/* still additional parameter has to be introduced */
 	pheromone[h][j] = (1. - 0.1) * pheromone[h][j] + 0.1 * trail_0;
 	pheromone[j][h] = pheromone[h][j];
@@ -732,17 +732,17 @@ public class Ants {
 
 	// TRACE ( System.out.println("bwas specific: best-worst pheromone update\n"); );
 
-	pos2 = new int[Tsp.number_of_cities];
-	for (i = 0; i < Tsp.number_of_cities; i++) {
+	pos2 = new int[Tsp.n];
+	for (i = 0; i < Tsp.n; i++) {
 	    pos2[a2.tour[i]] = i;
 	}
 
-	for (i = 0; i < Tsp.number_of_cities; i++) {
+	for (i = 0; i < Tsp.n; i++) {
 	    j = a1.tour[i];
 	    h = a1.tour[i + 1];
 	    pos = pos2[j];
 	    if (pos - 1 < 0)
-		pred = Tsp.number_of_cities - 1;
+		pred = Tsp.n - 1;
 	    else
 		pred = pos - 1;
 	    if (a2.tour[pos + 1] == h)
@@ -770,10 +770,10 @@ public class Ants {
 	// TRACE ( System.out.println("bwas specific: pheromone mutation\n"); );
 
 	/* compute average pheromone trail on edges of global best solution */
-	for (i = 0; i < Tsp.number_of_cities; i++) {
+	for (i = 0; i < Tsp.n; i++) {
 	    avg_trail += pheromone[best_so_far_ant.tour[i]][best_so_far_ant.tour[i + 1]];
 	}
-	avg_trail /= (double) Tsp.number_of_cities;
+	avg_trail /= (double) Tsp.n;
 
 	/* determine mutation strength of pheromone matrix */
 	/*
@@ -785,22 +785,22 @@ public class Ants {
 	    mutation_strength = 4. * avg_trail * (Timer.elapsed_time() - InOut.restart_time)
 		    / (InOut.max_time - InOut.restart_time + 0.0001);
 	else if (InOut.max_tours > 100)
-	    mutation_strength = 4. * avg_trail * (InOut.iteration_counter - InOut.restart_iteration)
+	    mutation_strength = 4. * avg_trail * (InOut.iteration - InOut.restart_iteration)
 		    / (InOut.max_tours - InOut.restart_iteration + 1);
 	else
 	    System.out.println("apparently no termination condition applied!!\n");
 
 	/* finally use fast version of matrix mutation */
-	mutation_rate = mutation_rate / Tsp.number_of_cities * nn_ants;
-	num_mutations = (int) (Tsp.number_of_cities * mutation_rate / 2);
+	mutation_rate = mutation_rate / Tsp.n * nn_ants;
+	num_mutations = (int) (Tsp.n * mutation_rate / 2);
 	/* / 2 because of adjustment for symmetry of pheromone trails */
 
 	if (InOut.restart_iteration < 2)
 	    num_mutations = 0;
 
 	for (i = 0; i < num_mutations; i++) {
-	    j = (int) (Utilities.ran01(Utilities.seed) * (double) Tsp.number_of_cities);
-	    k = (int) (Utilities.ran01(Utilities.seed) * (double) Tsp.number_of_cities);
+	    j = (int) (Utilities.ran01(Utilities.seed) * (double) Tsp.n);
+	    k = (int) (Utilities.ran01(Utilities.seed) * (double) Tsp.n);
 	    if (Utilities.ran01(Utilities.seed) < 0.5) {
 		pheromone[j][k] += mutation_strength;
 		pheromone[k][j] = pheromone[j][k];
@@ -830,10 +830,10 @@ public class Ants {
 	int i;
 
 	a2.tour_length = a1.tour_length;
-	for (i = 0; i < Tsp.number_of_cities; i++) {
+	for (i = 0; i < Tsp.n; i++) {
 	    a2.tour[i] = a1.tour[i];
 	}
-	a2.tour[Tsp.number_of_cities] = a2.tour[0];
+	a2.tour[Tsp.n] = a2.tour[0];
     }
 
     static int nn_tour()
@@ -846,26 +846,26 @@ public class Ants {
     {
 	int phase, help;
 
-	ant_empty_memory(ant_colony[0]);
+	ant_empty_memory(ant[0]);
 
 	phase = 0; /* counter of the construction steps */
-	place_ant(ant_colony[0], phase);
+	place_ant(ant[0], phase);
 
-	while (phase < Tsp.number_of_cities - 1) {
+	while (phase < Tsp.n - 1) {
 	    phase++;
-	    choose_closest_next(ant_colony[0], phase);
+	    choose_closest_next(ant[0], phase);
 	}
-	phase = Tsp.number_of_cities;
-	ant_colony[0].tour[Tsp.number_of_cities] = ant_colony[0].tour[0];
+	phase = Tsp.n;
+	ant[0].tour[Tsp.n] = ant[0].tour[0];
 	if (LocalSearch.ls_flag != 0) {
-	    LocalSearch.two_opt_first(ant_colony[0].tour);
+	    LocalSearch.two_opt_first(ant[0].tour);
 	}
 	InOut.n_tours += 1;
 	/* copy_from_to( &ant[0], best_so_far_ant ); */
-	ant_colony[0].tour_length = Tsp.compute_tour_length(ant_colony[0].tour);
+	ant[0].tour_length = Tsp.compute_tour_length(ant[0].tour);
 
-	help = ant_colony[0].tour_length;
-	ant_empty_memory(ant_colony[0]);
+	help = ant[0].tour_length;
+	ant_empty_memory(ant[0]);
 	return help;
     }
 
@@ -880,18 +880,18 @@ public class Ants {
 	int distance;
 	int[] pos2; /* positions of cities in tour of ant a2 */
 
-	pos2 = new int[Tsp.number_of_cities];
-	for (i = 0; i < Tsp.number_of_cities; i++) {
+	pos2 = new int[Tsp.n];
+	for (i = 0; i < Tsp.n; i++) {
 	    pos2[a2.tour[i]] = i;
 	}
 
 	distance = 0;
-	for (i = 0; i < Tsp.number_of_cities; i++) {
+	for (i = 0; i < Tsp.n; i++) {
 	    j = a1.tour[i];
 	    h = a1.tour[i + 1];
 	    pos = pos2[j];
 	    if (pos - 1 < 0)
-		pred = Tsp.number_of_cities - 1;
+		pred = Tsp.n - 1;
 	    else
 		pred = pos - 1;
 	    if (a2.tour[pos + 1] == h)

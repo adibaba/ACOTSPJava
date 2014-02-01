@@ -1,4 +1,5 @@
 package de.adrianwilke.acotspjava;
+
 /**
  * ACO algorithms for the TSP
  * 
@@ -7,7 +8,7 @@ package de.adrianwilke.acotspjava;
  */
 public class LocalSearch {
     /*
-
+     * 
      * ################################################
      * ########## ACO algorithms for the TSP ##########
      * ################################################
@@ -114,7 +115,7 @@ public class LocalSearch {
 	int p_c1, p_c2; /* predecessor cities of c1 and c2 */
 	int pos_c1, pos_c2; /* positions of cities c1, c2 */
 	int i, j, h, l;
-	int help, n_improves = 0, n_exchanges = 0;
+	int help;
 	boolean improve_node, improvement_flag;
 	int h1 = 0, h2 = 0, h3 = 0, h4 = 0;
 	int radius; /* radius of nn-search */
@@ -123,24 +124,24 @@ public class LocalSearch {
 	int[] pos; /* positions of cities in tour */
 	boolean[] dlb; /* vector containing don't look bits */
 
-	pos = new int[Tsp.number_of_cities];
-	dlb = new boolean[Tsp.number_of_cities];
-	for (i = 0; i < Tsp.number_of_cities; i++) {
+	pos = new int[Tsp.n];
+	dlb = new boolean[Tsp.n];
+	for (i = 0; i < Tsp.n; i++) {
 	    pos[tour[i]] = i;
 	    dlb[i] = false;
 	}
 
 	improvement_flag = true;
-	random_vector = generate_random_permutation(Tsp.number_of_cities);
+	random_vector = generate_random_permutation(Tsp.n);
 
 	while (improvement_flag) {
 
 	    improvement_flag = false;
 
-	    for (l = 0; l < Tsp.number_of_cities; l++) {
+	    for (l = 0; l < Tsp.n; l++) {
 
 		c1 = random_vector[l];
-		// DEBUG ( assert ( c1 < Tsp.number_of_cities && c1 >= 0); )
+		// DEBUG ( assert ( c1 < Tsp.n && c1 >= 0); )
 		if (dlb_flag && dlb[c1])
 		    continue;
 		improve_node = false;
@@ -173,7 +174,7 @@ public class LocalSearch {
 		    if (pos_c1 > 0)
 			p_c1 = tour[pos_c1 - 1];
 		    else
-			p_c1 = tour[Tsp.number_of_cities - 1];
+			p_c1 = tour[Tsp.n - 1];
 		    radius = Tsp.instance.distance[p_c1][c1];
 		    for (h = 0; h < nn_ls; h++) {
 			c2 = Tsp.instance.nn_list[c1][h]; /* exchange partner, determine its position */
@@ -182,7 +183,7 @@ public class LocalSearch {
 			    if (pos_c2 > 0)
 				p_c2 = tour[pos_c2 - 1];
 			    else
-				p_c2 = tour[Tsp.number_of_cities - 1];
+				p_c2 = tour[Tsp.n - 1];
 			    if (p_c2 == c1)
 				continue;
 			    if (p_c1 == c2)
@@ -205,7 +206,6 @@ public class LocalSearch {
 
 		if (improve_node || gotoExchange) {
 		    gotoExchange = false;
-		    n_exchanges++;
 		    improvement_flag = true;
 		    dlb[h1] = false;
 		    dlb[h2] = false;
@@ -220,7 +220,7 @@ public class LocalSearch {
 			h2 = h4;
 			h4 = help;
 		    }
-		    if (pos[h3] - pos[h2] < Tsp.number_of_cities / 2 + 1) {
+		    if (pos[h3] - pos[h2] < Tsp.n / 2 + 1) {
 			/* reverse inner part from pos[h2] to pos[h3] */
 			i = pos[h2];
 			j = pos[h3];
@@ -239,7 +239,7 @@ public class LocalSearch {
 			i = pos[h1];
 			j = pos[h4];
 			if (j > i)
-			    help = Tsp.number_of_cities - (j - i) + 1;
+			    help = Tsp.n - (j - i) + 1;
 			else
 			    help = (i - j) + 1;
 			help = help / 2;
@@ -253,19 +253,16 @@ public class LocalSearch {
 			    i--;
 			    j++;
 			    if (i < 0)
-				i = Tsp.number_of_cities - 1;
-			    if (j >= Tsp.number_of_cities)
+				i = Tsp.n - 1;
+			    if (j >= Tsp.n)
 				j = 0;
 			}
-			tour[Tsp.number_of_cities] = tour[0];
+			tour[Tsp.n] = tour[0];
 		    }
 		} else {
 		    dlb[c1] = true;
 		}
 
-	    }
-	    if (improvement_flag) {
-		n_improves++;
 	    }
 	}
 
@@ -306,15 +303,15 @@ public class LocalSearch {
 	int[] pos; /* positions of cities in tour */
 	boolean[] dlb; /* vector containing don't look bits */
 
-	pos = new int[Tsp.number_of_cities];
-	dlb = new boolean[Tsp.number_of_cities];
-	for (i = 0; i < Tsp.number_of_cities; i++) {
+	pos = new int[Tsp.n];
+	dlb = new boolean[Tsp.n];
+	for (i = 0; i < Tsp.n; i++) {
 	    pos[tour[i]] = i;
 	    dlb[i] = false;
 	}
 
 	improvement_flag = true;
-	random_vector = generate_random_permutation(Tsp.number_of_cities);
+	random_vector = generate_random_permutation(Tsp.n);
 
 	while (improvement_flag) {
 
@@ -322,10 +319,10 @@ public class LocalSearch {
 	    two_move = false;
 	    node_move = false;
 
-	    for (l = 0; l < Tsp.number_of_cities; l++) {
+	    for (l = 0; l < Tsp.n; l++) {
 
 		c1 = random_vector[l];
-		// DEBUG ( assert ( c1 < Tsp.number_of_cities && c1 >= 0); )
+		// DEBUG ( assert ( c1 < Tsp.n && c1 >= 0); )
 		if (dlb_flag && dlb[c1])
 		    continue;
 		improve_node = false;
@@ -355,7 +352,7 @@ public class LocalSearch {
 			if (pos_c2 > 0)
 			    p_c2 = tour[pos_c2 - 1];
 			else
-			    p_c2 = tour[Tsp.number_of_cities - 1];
+			    p_c2 = tour[Tsp.n - 1];
 			gain = -radius + Tsp.instance.distance[c1][c2] + Tsp.instance.distance[c2][s_c1]
 				+ Tsp.instance.distance[p_c2][s_c2] - Tsp.instance.distance[c2][s_c2]
 				- Tsp.instance.distance[p_c2][c2];
@@ -387,7 +384,7 @@ public class LocalSearch {
 		    if (pos_c1 > 0)
 			p_c1 = tour[pos_c1 - 1];
 		    else
-			p_c1 = tour[Tsp.number_of_cities - 1];
+			p_c1 = tour[Tsp.n - 1];
 		    radius = Tsp.instance.distance[p_c1][c1];
 		    for (h = 0; h < nn_ls; h++) {
 			c2 = Tsp.instance.nn_list[c1][h]; /* exchange partner, determine its position */
@@ -396,7 +393,7 @@ public class LocalSearch {
 			    if (pos_c2 > 0)
 				p_c2 = tour[pos_c2 - 1];
 			    else
-				p_c2 = tour[Tsp.number_of_cities - 1];
+				p_c2 = tour[Tsp.n - 1];
 			    if (p_c2 == c1)
 				continue;
 			    if (p_c1 == c2)
@@ -457,7 +454,7 @@ public class LocalSearch {
 			    h2 = h4;
 			    h4 = help;
 			}
-			if (pos[h3] - pos[h2] < Tsp.number_of_cities / 2 + 1) {
+			if (pos[h3] - pos[h2] < Tsp.n / 2 + 1) {
 			    /* reverse inner part from pos[h2] to pos[h3] */
 			    i = pos[h2];
 			    j = pos[h3];
@@ -476,7 +473,7 @@ public class LocalSearch {
 			    i = pos[h1];
 			    j = pos[h4];
 			    if (j > i)
-				help = Tsp.number_of_cities - (j - i) + 1;
+				help = Tsp.n - (j - i) + 1;
 			    else
 				help = (i - j) + 1;
 			    help = help / 2;
@@ -490,11 +487,11 @@ public class LocalSearch {
 				i--;
 				j++;
 				if (i < 0)
-				    i = Tsp.number_of_cities - 1;
-				if (j >= Tsp.number_of_cities)
+				    i = Tsp.n - 1;
+				if (j >= Tsp.n)
 				    j = 0;
 			    }
-			    tour[Tsp.number_of_cities] = tour[0];
+			    tour[Tsp.n] = tour[0];
 			}
 		    } else if (node_move) {
 			improvement_flag = true;
@@ -515,7 +512,7 @@ public class LocalSearch {
 			    }
 			    tour[i] = h3;
 			    pos[h3] = i;
-			    tour[Tsp.number_of_cities] = tour[0];
+			    tour[Tsp.n] = tour[0];
 			} else {
 			    /* pos[h3] > pos[h1] */
 			    help = pos[h3] - pos[h1];
@@ -529,7 +526,7 @@ public class LocalSearch {
 			    }
 			    tour[i] = h3;
 			    pos[h3] = i;
-			    tour[Tsp.number_of_cities] = tour[0];
+			    tour[Tsp.n] = tour[0];
 			    /* } */
 			}
 		    } else {
@@ -578,7 +575,7 @@ public class LocalSearch {
 
 	int c1, c2, c3; /* cities considered for an exchange */
 	int s_c1, s_c2, s_c3; /* successors of these cities */
-	int p_c1, p_c2, p_c3; /* predecessors of these cities */
+	int p_c2, p_c3; /* predecessors of these cities */
 	int pos_c1, pos_c2, pos_c3; /* positions of cities c1, c2, c3 */
 	int i, j, h, g, l;
 	boolean improvement_flag;
@@ -604,23 +601,23 @@ public class LocalSearch {
 	int[] hh_tour; /* help vector for performing exchange move */
 	int[] random_vector;
 
-	pos = new int[Tsp.number_of_cities];
-	dlb = new boolean[Tsp.number_of_cities];
-	h_tour = new int[Tsp.number_of_cities];
-	hh_tour = new int[Tsp.number_of_cities];
+	pos = new int[Tsp.n];
+	dlb = new boolean[Tsp.n];
+	h_tour = new int[Tsp.n];
+	hh_tour = new int[Tsp.n];
 
-	for (i = 0; i < Tsp.number_of_cities; i++) {
+	for (i = 0; i < Tsp.n; i++) {
 	    pos[tour[i]] = i;
 	    dlb[i] = false;
 	}
 	improvement_flag = true;
-	random_vector = generate_random_permutation(Tsp.number_of_cities);
+	random_vector = generate_random_permutation(Tsp.n);
 
 	while (improvement_flag) {
 	    move_value = 0;
 	    improvement_flag = false;
 
-	    for (l = 0; l < Tsp.number_of_cities; l++) {
+	    for (l = 0; l < Tsp.n; l++) {
 
 		c1 = random_vector[l];
 		if (dlb_flag && dlb[c1])
@@ -630,14 +627,9 @@ public class LocalSearch {
 		move_flag = 0;
 		pos_c1 = pos[c1];
 		s_c1 = tour[pos_c1 + 1];
-		if (pos_c1 > 0)
-		    p_c1 = tour[pos_c1 - 1];
-		else
-		    p_c1 = tour[Tsp.number_of_cities - 1];
 
 		h = 0; /* Search for one of the h-nearest neighbours */
-		whileLoop:
-		while (h < nn_ls) {
+		whileLoop: while (h < nn_ls) {
 
 		    c2 = Tsp.instance.nn_list[c1][h]; /* second city, determine its position */
 		    pos_c2 = pos[c2];
@@ -645,7 +637,7 @@ public class LocalSearch {
 		    if (pos_c2 > 0)
 			p_c2 = tour[pos_c2 - 1];
 		    else
-			p_c2 = tour[Tsp.number_of_cities - 1];
+			p_c2 = tour[Tsp.n - 1];
 
 		    diffs = 0;
 		    diffp = 0;
@@ -695,7 +687,7 @@ public class LocalSearch {
 			if (pos_c3 > 0)
 			    p_c3 = tour[pos_c3 - 1];
 			else
-			    p_c3 = tour[Tsp.number_of_cities - 1];
+			    p_c3 = tour[Tsp.n - 1];
 
 			if (c3 == c1) {
 			    g++;
@@ -850,15 +842,15 @@ public class LocalSearch {
 			    if (pos_c2 > pos_c1)
 				n1 = pos_c2 - pos_c1;
 			    else
-				n1 = Tsp.number_of_cities - (pos_c1 - pos_c2);
+				n1 = Tsp.n - (pos_c1 - pos_c2);
 			    if (pos_c3 > pos_c2)
 				n2 = pos_c3 - pos_c2;
 			    else
-				n2 = Tsp.number_of_cities - (pos_c2 - pos_c3);
+				n2 = Tsp.n - (pos_c2 - pos_c3);
 			    if (pos_c1 > pos_c3)
 				n3 = pos_c1 - pos_c3;
 			    else
-				n3 = Tsp.number_of_cities - (pos_c3 - pos_c1);
+				n3 = Tsp.n - (pos_c3 - pos_c1);
 
 			    /* n1: length h2 - h3, n2: length h4 - h5, n3: length h6 - h1 */
 			    val[0] = n1;
@@ -889,7 +881,7 @@ public class LocalSearch {
 				while (j != h) {
 				    i++;
 				    j++;
-				    if (j >= Tsp.number_of_cities)
+				    if (j >= Tsp.n)
 					j = 0;
 				    h_tour[i] = tour[j];
 				    n1++;
@@ -902,10 +894,10 @@ public class LocalSearch {
 				pos[tour[i]] = j;
 				while (i != pos_c1) {
 				    i++;
-				    if (i >= Tsp.number_of_cities)
+				    if (i >= Tsp.n)
 					i = 0;
 				    j++;
-				    if (j >= Tsp.number_of_cities)
+				    if (j >= Tsp.n)
 					j = 0;
 				    tour[j] = tour[i];
 				    pos[tour[i]] = j;
@@ -913,16 +905,16 @@ public class LocalSearch {
 
 				/* Now copy stored part from h_tour */
 				j++;
-				if (j >= Tsp.number_of_cities)
+				if (j >= Tsp.n)
 				    j = 0;
 				for (i = 0; i < n1; i++) {
 				    tour[j] = h_tour[i];
 				    pos[h_tour[i]] = j;
 				    j++;
-				    if (j >= Tsp.number_of_cities)
+				    if (j >= Tsp.n)
 					j = 0;
 				}
-				tour[Tsp.number_of_cities] = tour[0];
+				tour[Tsp.n] = tour[0];
 			    } else if (h == 1) {
 
 				/*
@@ -938,7 +930,7 @@ public class LocalSearch {
 				while (j != h) {
 				    i++;
 				    j++;
-				    if (j >= Tsp.number_of_cities)
+				    if (j >= Tsp.n)
 					j = 0;
 				    h_tour[i] = tour[j];
 				    n1++;
@@ -951,10 +943,10 @@ public class LocalSearch {
 				pos[tour[i]] = j;
 				while (i != pos_c2) {
 				    i++;
-				    if (i >= Tsp.number_of_cities)
+				    if (i >= Tsp.n)
 					i = 0;
 				    j++;
-				    if (j >= Tsp.number_of_cities)
+				    if (j >= Tsp.n)
 					j = 0;
 				    tour[j] = tour[i];
 				    pos[tour[i]] = j;
@@ -962,16 +954,16 @@ public class LocalSearch {
 
 				/* Now copy stored part from h_tour */
 				j++;
-				if (j >= Tsp.number_of_cities)
+				if (j >= Tsp.n)
 				    j = 0;
 				for (i = 0; i < n1; i++) {
 				    tour[j] = h_tour[i];
 				    pos[h_tour[i]] = j;
 				    j++;
-				    if (j >= Tsp.number_of_cities)
+				    if (j >= Tsp.n)
 					j = 0;
 				}
-				tour[Tsp.number_of_cities] = tour[0];
+				tour[Tsp.n] = tour[0];
 			    } else if (h == 2) {
 				/*
 				 * copy part from pos[h2] to pos[h3]
@@ -986,7 +978,7 @@ public class LocalSearch {
 				while (j != h) {
 				    i++;
 				    j++;
-				    if (j >= Tsp.number_of_cities)
+				    if (j >= Tsp.n)
 					j = 0;
 				    h_tour[i] = tour[j];
 				    n1++;
@@ -999,10 +991,10 @@ public class LocalSearch {
 				pos[tour[i]] = j;
 				while (i != pos_c3) {
 				    i++;
-				    if (i >= Tsp.number_of_cities)
+				    if (i >= Tsp.n)
 					i = 0;
 				    j++;
-				    if (j >= Tsp.number_of_cities)
+				    if (j >= Tsp.n)
 					j = 0;
 				    tour[j] = tour[i];
 				    pos[tour[i]] = j;
@@ -1010,29 +1002,29 @@ public class LocalSearch {
 
 				/* Now copy stored part from h_tour */
 				j++;
-				if (j >= Tsp.number_of_cities)
+				if (j >= Tsp.n)
 				    j = 0;
 				for (i = 0; i < n1; i++) {
 				    tour[j] = h_tour[i];
 				    pos[h_tour[i]] = j;
 				    j++;
-				    if (j >= Tsp.number_of_cities)
+				    if (j >= Tsp.n)
 					j = 0;
 				}
-				tour[Tsp.number_of_cities] = tour[0];
+				tour[Tsp.n] = tour[0];
 			    }
 			} else if (move_flag == 1) {
 
 			    if (pos_c3 < pos_c2)
 				n1 = pos_c2 - pos_c3;
 			    else
-				n1 = Tsp.number_of_cities - (pos_c3 - pos_c2);
+				n1 = Tsp.n - (pos_c3 - pos_c2);
 			    if (pos_c3 > pos_c1)
 				n2 = pos_c3 - pos_c1 + 1;
 			    else
-				n2 = Tsp.number_of_cities - (pos_c1 - pos_c3 + 1);
+				n2 = Tsp.n - (pos_c1 - pos_c3 + 1);
 			    if (pos_c2 > pos_c1)
-				n3 = Tsp.number_of_cities - (pos_c2 - pos_c1 + 1);
+				n3 = Tsp.n - (pos_c2 - pos_c1 + 1);
 			    else
 				n3 = pos_c1 - pos_c2 + 1;
 
@@ -1067,7 +1059,7 @@ public class LocalSearch {
 				    i++;
 				    j--;
 				    if (j < 0)
-					j = Tsp.number_of_cities - 1;
+					j = Tsp.n - 1;
 				    h_tour[i] = tour[j];
 				    n1++;
 				}
@@ -1081,7 +1073,7 @@ public class LocalSearch {
 				    i++;
 				    j--;
 				    if (j < 0)
-					j = Tsp.number_of_cities - 1;
+					j = Tsp.n - 1;
 				    hh_tour[i] = tour[j];
 				    n2++;
 				}
@@ -1091,7 +1083,7 @@ public class LocalSearch {
 				    tour[j] = hh_tour[i];
 				    pos[hh_tour[i]] = j;
 				    j++;
-				    if (j >= Tsp.number_of_cities)
+				    if (j >= Tsp.n)
 					j = 0;
 				}
 
@@ -1100,10 +1092,10 @@ public class LocalSearch {
 				    tour[j] = h_tour[i];
 				    pos[h_tour[i]] = j;
 				    j++;
-				    if (j >= Tsp.number_of_cities)
+				    if (j >= Tsp.n)
 					j = 0;
 				}
-				tour[Tsp.number_of_cities] = tour[0];
+				tour[Tsp.n] = tour[0];
 			    } else if (h == 1) {
 
 				/* copy part from h3 to h6 (wird inverted) erstellen : */
@@ -1116,7 +1108,7 @@ public class LocalSearch {
 				    i++;
 				    j--;
 				    if (j < 0)
-					j = Tsp.number_of_cities - 1;
+					j = Tsp.n - 1;
 				    h_tour[i] = tour[j];
 				    n1++;
 				}
@@ -1129,9 +1121,9 @@ public class LocalSearch {
 				while (i != pos_c1) {
 				    i++;
 				    j++;
-				    if (j >= Tsp.number_of_cities)
+				    if (j >= Tsp.n)
 					j = 0;
-				    if (i >= Tsp.number_of_cities)
+				    if (i >= Tsp.n)
 					i = 0;
 				    tour[j] = tour[i];
 				    pos[tour[i]] = j;
@@ -1139,20 +1131,20 @@ public class LocalSearch {
 
 				/* Now copy stored part from h_tour */
 				j++;
-				if (j >= Tsp.number_of_cities)
+				if (j >= Tsp.n)
 				    j = 0;
 				i = 0;
 				tour[j] = h_tour[i];
 				pos[h_tour[i]] = j;
 				while (j != pos_c1) {
 				    j++;
-				    if (j >= Tsp.number_of_cities)
+				    if (j >= Tsp.n)
 					j = 0;
 				    i++;
 				    tour[j] = h_tour[i];
 				    pos[h_tour[i]] = j;
 				}
-				tour[Tsp.number_of_cities] = tour[0];
+				tour[Tsp.n] = tour[0];
 			    }
 
 			    else if (h == 2) {
@@ -1170,7 +1162,7 @@ public class LocalSearch {
 				while (j != h) {
 				    i++;
 				    j++;
-				    if (j >= Tsp.number_of_cities)
+				    if (j >= Tsp.n)
 					j = 0;
 				    h_tour[i] = tour[j];
 				    n1++;
@@ -1184,7 +1176,7 @@ public class LocalSearch {
 				    i++;
 				    j--;
 				    if (j < 0)
-					j = Tsp.number_of_cities - 1;
+					j = Tsp.n - 1;
 				    hh_tour[i] = tour[j];
 				    n2++;
 				}
@@ -1194,7 +1186,7 @@ public class LocalSearch {
 				    tour[j] = hh_tour[i];
 				    pos[hh_tour[i]] = j;
 				    j++;
-				    if (j >= Tsp.number_of_cities)
+				    if (j >= Tsp.n)
 					j = 0;
 				}
 
@@ -1203,25 +1195,25 @@ public class LocalSearch {
 				    tour[j] = h_tour[i];
 				    pos[h_tour[i]] = j;
 				    j++;
-				    if (j >= Tsp.number_of_cities)
+				    if (j >= Tsp.n)
 					j = 0;
 				}
-				tour[Tsp.number_of_cities] = tour[0];
+				tour[Tsp.n] = tour[0];
 			    }
 			} else if (move_flag == 2) {
 
 			    if (pos_c3 < pos_c1)
 				n1 = pos_c1 - pos_c3;
 			    else
-				n1 = Tsp.number_of_cities - (pos_c3 - pos_c1);
+				n1 = Tsp.n - (pos_c3 - pos_c1);
 			    if (pos_c3 > pos_c2)
 				n2 = pos_c3 - pos_c2;
 			    else
-				n2 = Tsp.number_of_cities - (pos_c2 - pos_c3);
+				n2 = Tsp.n - (pos_c2 - pos_c3);
 			    if (pos_c2 > pos_c1)
 				n3 = pos_c2 - pos_c1;
 			    else
-				n3 = Tsp.number_of_cities - (pos_c1 - pos_c2);
+				n3 = Tsp.n - (pos_c1 - pos_c2);
 
 			    val[0] = n1;
 			    val[1] = n2;
@@ -1253,7 +1245,7 @@ public class LocalSearch {
 				    i++;
 				    j--;
 				    if (j < 0)
-					j = Tsp.number_of_cities - 1;
+					j = Tsp.n - 1;
 				    h_tour[i] = tour[j];
 				    n1++;
 				}
@@ -1267,7 +1259,7 @@ public class LocalSearch {
 				    i++;
 				    j--;
 				    if (j < 0)
-					j = Tsp.number_of_cities - 1;
+					j = Tsp.n - 1;
 				    hh_tour[i] = tour[j];
 				    n2++;
 				}
@@ -1277,7 +1269,7 @@ public class LocalSearch {
 				    tour[j] = h_tour[i];
 				    pos[h_tour[i]] = j;
 				    j++;
-				    if (j >= Tsp.number_of_cities)
+				    if (j >= Tsp.n)
 					j = 0;
 				}
 
@@ -1285,10 +1277,10 @@ public class LocalSearch {
 				    tour[j] = hh_tour[i];
 				    pos[hh_tour[i]] = j;
 				    j++;
-				    if (j >= Tsp.number_of_cities)
+				    if (j >= Tsp.n)
 					j = 0;
 				}
-				tour[Tsp.number_of_cities] = tour[0];
+				tour[Tsp.n] = tour[0];
 				/* getchar(); */
 			    } else if (h == 1) {
 
@@ -1305,7 +1297,7 @@ public class LocalSearch {
 				while (j != h) {
 				    i++;
 				    j++;
-				    if (j >= Tsp.number_of_cities)
+				    if (j >= Tsp.n)
 					j = 0;
 				    h_tour[i] = tour[j];
 				    n1++;
@@ -1320,7 +1312,7 @@ public class LocalSearch {
 				    i++;
 				    j--;
 				    if (j < 0)
-					j = Tsp.number_of_cities - 1;
+					j = Tsp.n - 1;
 				    hh_tour[i] = tour[j];
 				    n2++;
 				}
@@ -1329,17 +1321,17 @@ public class LocalSearch {
 				    tour[j] = h_tour[i];
 				    pos[h_tour[i]] = j;
 				    j++;
-				    if (j >= Tsp.number_of_cities)
+				    if (j >= Tsp.n)
 					j = 0;
 				}
 				for (i = 0; i < n2; i++) {
 				    tour[j] = hh_tour[i];
 				    pos[hh_tour[i]] = j;
 				    j++;
-				    if (j >= Tsp.number_of_cities)
+				    if (j >= Tsp.n)
 					j = 0;
 				}
-				tour[Tsp.number_of_cities] = tour[0];
+				tour[Tsp.n] = tour[0];
 			    }
 
 			    else if (h == 2) {
@@ -1359,7 +1351,7 @@ public class LocalSearch {
 				    i++;
 				    j--;
 				    if (j < 0)
-					j = Tsp.number_of_cities - 1;
+					j = Tsp.n - 1;
 				    h_tour[i] = tour[j];
 				    n1++;
 				}
@@ -1372,7 +1364,7 @@ public class LocalSearch {
 				while (j != h) {
 				    i++;
 				    j++;
-				    if (j >= Tsp.number_of_cities)
+				    if (j >= Tsp.n)
 					j = 0;
 				    hh_tour[i] = tour[j];
 				    n2++;
@@ -1384,7 +1376,7 @@ public class LocalSearch {
 				    tour[j] = h_tour[i];
 				    pos[h_tour[i]] = j;
 				    j++;
-				    if (j >= Tsp.number_of_cities)
+				    if (j >= Tsp.n)
 					j = 0;
 				}
 
@@ -1393,25 +1385,25 @@ public class LocalSearch {
 				    tour[j] = hh_tour[i];
 				    pos[hh_tour[i]] = j;
 				    j++;
-				    if (j >= Tsp.number_of_cities)
+				    if (j >= Tsp.n)
 					j = 0;
 				}
-				tour[Tsp.number_of_cities] = tour[0];
+				tour[Tsp.n] = tour[0];
 			    }
 			} else if (move_flag == 3) {
 
 			    if (pos_c3 < pos_c1)
 				n1 = pos_c1 - pos_c3;
 			    else
-				n1 = Tsp.number_of_cities - (pos_c3 - pos_c1);
+				n1 = Tsp.n - (pos_c3 - pos_c1);
 			    if (pos_c3 > pos_c2)
 				n2 = pos_c3 - pos_c2;
 			    else
-				n2 = Tsp.number_of_cities - (pos_c2 - pos_c3);
+				n2 = Tsp.n - (pos_c2 - pos_c3);
 			    if (pos_c2 > pos_c1)
 				n3 = pos_c2 - pos_c1;
 			    else
-				n3 = Tsp.number_of_cities - (pos_c1 - pos_c2);
+				n3 = Tsp.n - (pos_c1 - pos_c2);
 			    /* n1: length h6 - h1, n2: length h4 - h5, n2: length h2 - h3 */
 
 			    val[0] = n1;
@@ -1444,7 +1436,7 @@ public class LocalSearch {
 				    i++;
 				    j--;
 				    if (j < 0)
-					j = Tsp.number_of_cities - 1;
+					j = Tsp.n - 1;
 				    h_tour[i] = tour[j];
 				    n1++;
 				}
@@ -1456,25 +1448,25 @@ public class LocalSearch {
 				pos[h4] = j;
 				while (i != h) {
 				    i++;
-				    if (i >= Tsp.number_of_cities)
+				    if (i >= Tsp.n)
 					i = 0;
 				    j++;
-				    if (j >= Tsp.number_of_cities)
+				    if (j >= Tsp.n)
 					j = 0;
 				    tour[j] = tour[i];
 				    pos[tour[i]] = j;
 				}
 				j++;
-				if (j >= Tsp.number_of_cities)
+				if (j >= Tsp.n)
 				    j = 0;
 				for (i = 0; i < n1; i++) {
 				    tour[j] = h_tour[i];
 				    pos[h_tour[i]] = j;
 				    j++;
-				    if (j >= Tsp.number_of_cities)
+				    if (j >= Tsp.n)
 					j = 0;
 				}
-				tour[Tsp.number_of_cities] = tour[0];
+				tour[Tsp.n] = tour[0];
 			    } else if (h == 1) {
 
 				/*
@@ -1491,7 +1483,7 @@ public class LocalSearch {
 				    i++;
 				    j--;
 				    if (j < 0)
-					j = Tsp.number_of_cities - 1;
+					j = Tsp.n - 1;
 				    h_tour[i] = tour[j];
 				    n1++;
 				}
@@ -1504,7 +1496,7 @@ public class LocalSearch {
 				while (j != h) {
 				    i++;
 				    j++;
-				    if (j >= Tsp.number_of_cities)
+				    if (j >= Tsp.n)
 					j = 0;
 				    hh_tour[i] = tour[j];
 				    n2++;
@@ -1515,7 +1507,7 @@ public class LocalSearch {
 				    tour[j] = h_tour[i];
 				    pos[h_tour[i]] = j;
 				    j++;
-				    if (j >= Tsp.number_of_cities)
+				    if (j >= Tsp.n)
 					j = 0;
 				}
 
@@ -1523,10 +1515,10 @@ public class LocalSearch {
 				    tour[j] = hh_tour[i];
 				    pos[hh_tour[i]] = j;
 				    j++;
-				    if (j >= Tsp.number_of_cities)
+				    if (j >= Tsp.n)
 					j = 0;
 				}
-				tour[Tsp.number_of_cities] = tour[0];
+				tour[Tsp.n] = tour[0];
 			    }
 
 			    else if (h == 2) {
@@ -1545,7 +1537,7 @@ public class LocalSearch {
 				    i++;
 				    j--;
 				    if (j < 0)
-					j = Tsp.number_of_cities - 1;
+					j = Tsp.n - 1;
 				    h_tour[i] = tour[j];
 				    n1++;
 				}
@@ -1559,7 +1551,7 @@ public class LocalSearch {
 				    i++;
 				    j--;
 				    if (j < 0)
-					j = Tsp.number_of_cities - 1;
+					j = Tsp.n - 1;
 				    hh_tour[i] = tour[j];
 				    n2++;
 				}
@@ -1570,7 +1562,7 @@ public class LocalSearch {
 				    tour[j] = h_tour[i];
 				    pos[h_tour[i]] = j;
 				    j++;
-				    if (j >= Tsp.number_of_cities)
+				    if (j >= Tsp.n)
 					j = 0;
 				}
 				/* Now copy stored part from h_tour */
@@ -1578,10 +1570,10 @@ public class LocalSearch {
 				    tour[j] = hh_tour[i];
 				    pos[hh_tour[i]] = j;
 				    j++;
-				    if (j >= Tsp.number_of_cities)
+				    if (j >= Tsp.n)
 					j = 0;
 				}
-				tour[Tsp.number_of_cities] = tour[0];
+				tour[Tsp.n] = tour[0];
 			    }
 			} else {
 			    System.err.println(" Some very strange error must have occurred !!!\n\n");
@@ -1603,7 +1595,7 @@ public class LocalSearch {
 			    h2 = h4;
 			    h4 = help;
 			}
-			if (pos[h3] - pos[h2] < Tsp.number_of_cities / 2 + 1) {
+			if (pos[h3] - pos[h2] < Tsp.n / 2 + 1) {
 			    /* reverse inner part from pos[h2] to pos[h3] */
 			    i = pos[h2];
 			    j = pos[h3];
@@ -1622,7 +1614,7 @@ public class LocalSearch {
 			    i = pos[h1];
 			    j = pos[h4];
 			    if (j > i)
-				help = Tsp.number_of_cities - (j - i) + 1;
+				help = Tsp.n - (j - i) + 1;
 			    else
 				help = (i - j) + 1;
 			    help = help / 2;
@@ -1636,11 +1628,11 @@ public class LocalSearch {
 				i--;
 				j++;
 				if (i < 0)
-				    i = Tsp.number_of_cities - 1;
-				if (j >= Tsp.number_of_cities)
+				    i = Tsp.n - 1;
+				if (j >= Tsp.n)
 				    j = 0;
 			    }
-			    tour[Tsp.number_of_cities] = tour[0];
+			    tour[Tsp.n] = tour[0];
 			}
 		    }
 		} else {

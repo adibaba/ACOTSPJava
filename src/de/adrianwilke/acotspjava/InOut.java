@@ -1,11 +1,17 @@
 package de.adrianwilke.acotspjava;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.io.Reader;
+import java.io.Writer;
+import java.util.HashMap;
+import java.util.Map;
 
 import de.adrianwilke.acotspjava.Tsp.problem;
 
@@ -74,7 +80,7 @@ public class InOut {
 
     static int n_try; /* try counter */
     static int n_tours; /* counter of number constructed tours */
-    static int iteration_counter; /* iteration counter */
+    static int iteration; /* iteration counter */
     static int restart_iteration; /* remember iteration when restart was done if any */
     static double restart_time; /* remember time when restart was done if any */
     static int max_tries; /* maximum number of independent tries */
@@ -99,6 +105,7 @@ public class InOut {
     /* ------------------------------------------------------------------------ */
 
     static File report, comp_report, stat_report;
+    private static Map<String, BufferedWriter> writer = new HashMap<String, BufferedWriter>();
 
     static String name_buf;
     static int opt;
@@ -147,10 +154,10 @@ public class InOut {
 		    System.err.println("Not a TSP Tsp.instance in TSPLIB format !!");
 		    System.exit(1);
 		} else if (line.startsWith("DIMENSION")) {
-		    Tsp.number_of_cities = Integer.parseInt(line.split(":")[1].trim());
-		    Tsp.instance.number_of_cities = Tsp.number_of_cities;
-		    nodeptr = new Tsp.point[Tsp.number_of_cities];
-		    assert (Tsp.number_of_cities > 2 && Tsp.number_of_cities < 6000);
+		    Tsp.n = Integer.parseInt(line.split(":")[1].trim());
+		    Tsp.instance.n = Tsp.n;
+		    nodeptr = new Tsp.point[Tsp.n];
+		    assert (Tsp.n > 2 && Tsp.n < 6000);
 		} else if (line.startsWith("DISPLAY_DATA_TYPE")) {
 		} else if (line.startsWith("EDGE_WEIGHT_TYPE")) {
 		    buf = line.split(":")[1].trim();
@@ -189,7 +196,7 @@ public class InOut {
 
 	bufferedReader.close();
 
-	// TRACE ( System.out.println("number of cities is %ld\n",Tsp.number_of_cities); )
+	// TRACE ( System.out.println("number of cities is %ld\n",Tsp.n); )
 	// TRACE ( System.out.println("\n... done\n"); )
 	return (nodeptr);
     }
@@ -202,10 +209,10 @@ public class InOut {
      * COMMENTS: none
      */
     {
-	System.out.println("best " + Ants.best_so_far_ant.tour_length + ", iteration: " + iteration_counter + ", time "
+	System.out.println("best " + Ants.best_so_far_ant.tour_length + ", iteration: " + iteration + ", time "
 		+ Timer.elapsed_time());
 	if (comp_report != null)
-	    printToFile(comp_report, "best " + Ants.best_so_far_ant.tour_length + "\t iteration " + iteration_counter
+	    printToFile(comp_report, "best " + Ants.best_so_far_ant.tour_length + "\t iteration " + iteration
 		    + "\t tours " + n_tours + "\t time " + time_used);
     }
 
@@ -215,7 +222,7 @@ public class InOut {
 	printToFile(file, "max_time\t\t " + max_time);
 	printToFile(file, "Utilities.seed\t\t " + Utilities.seed);
 	printToFile(file, "optimum\t\t\t " + optimal);
-	printToFile(file, "n_ants\t\t\t " + Ants.number_of_ants);
+	printToFile(file, "n_ants\t\t\t " + Ants.n_ants);
 	printToFile(file, "Ants.nn_ants\t\t\t " + Ants.nn_ants);
 	printToFile(file, "Ants.alpha\t\t\t " + Ants.alpha);
 	printToFile(file, "Ants.beta\t\t\t " + Ants.beta);
@@ -243,13 +250,12 @@ public class InOut {
      */
     {
 	System.err.println("\nDefault parameter settings are:\n\n");
-	// TODO
-	// fprintf_parameters(stderr);
+	fprintf_parameters(null);
     }
 
     static void set_default_as_parameters() {
 	assert (Ants.as_flag);
-	Ants.number_of_ants = -1; /* number of ants (-1 means Tsp.instance size) */
+	Ants.n_ants = -1; /* number of ants (-1 means Tsp.instance size) */
 	Ants.nn_ants = 20; /* number of nearest neighbours in tour construction */
 	Ants.alpha = 1.0;
 	Ants.beta = 2.0;
@@ -259,21 +265,21 @@ public class InOut {
 	Ants.elitist_ants = 0;
     }
 
-    void set_default_eas_parameters() {
+    static void set_default_eas_parameters() {
 	assert (Ants.eas_flag);
-	Ants.number_of_ants = -1; /* number of ants (-1 means Tsp.instance size) */
+	Ants.n_ants = -1; /* number of ants (-1 means Tsp.instance size) */
 	Ants.nn_ants = 20; /* number of nearest neighbours in tour construction */
 	Ants.alpha = 1.0;
 	Ants.beta = 2.0;
 	Ants.rho = 0.5;
 	Ants.q_0 = 0.0;
 	Ants.ras_ranks = 0;
-	Ants.elitist_ants = Ants.number_of_ants;
+	Ants.elitist_ants = Ants.n_ants;
     }
 
-    void set_default_ras_parameters() {
+    static void set_default_ras_parameters() {
 	assert (Ants.ras_flag);
-	Ants.number_of_ants = -1; /* number of ants (-1 means Tsp.instance size) */
+	Ants.n_ants = -1; /* number of ants (-1 means Tsp.instance size) */
 	Ants.nn_ants = 20; /* number of nearest neighbours in tour construction */
 	Ants.alpha = 1.0;
 	Ants.beta = 2.0;
@@ -283,9 +289,9 @@ public class InOut {
 	Ants.elitist_ants = 0;
     }
 
-    void set_default_bwas_parameters() {
+    static void set_default_bwas_parameters() {
 	assert (Ants.bwas_flag);
-	Ants.number_of_ants = -1; /* number of ants (-1 means Tsp.instance size) */
+	Ants.n_ants = -1; /* number of ants (-1 means Tsp.instance size) */
 	Ants.nn_ants = 20; /* number of nearest neighbours in tour construction */
 	Ants.alpha = 1.0;
 	Ants.beta = 2.0;
@@ -297,7 +303,7 @@ public class InOut {
 
     static void set_default_mmas_parameters() {
 	assert (Ants.mmas_flag);
-	Ants.number_of_ants = -1; /* number of ants (-1 means Tsp.instance size) */
+	Ants.n_ants = -1; /* number of ants (-1 means Tsp.instance size) */
 	Ants.nn_ants = 20; /* number of nearest neighbours in tour construction */
 	Ants.alpha = 1.0;
 	Ants.beta = 2.0;
@@ -307,9 +313,9 @@ public class InOut {
 	Ants.elitist_ants = 0;
     }
 
-    void set_default_acs_parameters() {
+    static void set_default_acs_parameters() {
 	assert (Ants.acs_flag);
-	Ants.number_of_ants = 10; /* number of ants (-1 means Tsp.instance size) */
+	Ants.n_ants = 10; /* number of ants (-1 means Tsp.instance size) */
 	Ants.nn_ants = 20; /* number of nearest neighbours in tour construction */
 	Ants.alpha = 1.0;
 	Ants.beta = 2.0;
@@ -324,7 +330,7 @@ public class InOut {
 	LocalSearch.dlb_flag = true; /* apply don't look bits in local search */
 	LocalSearch.nn_ls = 20; /* use fixed radius search in the 20 nearest neighbours */
 
-	Ants.number_of_ants = 25; /* number of ants */
+	Ants.n_ants = 25; /* number of ants */
 	Ants.nn_ants = 20; /* number of nearest neighbours in tour construction */
 	Ants.alpha = 1.0;
 	Ants.beta = 2.0;
@@ -332,15 +338,15 @@ public class InOut {
 	Ants.q_0 = 0.0;
 
 	if (Ants.mmas_flag) {
-	    Ants.number_of_ants = 25;
+	    Ants.n_ants = 25;
 	    Ants.rho = 0.2;
 	    Ants.q_0 = 0.00;
 	} else if (Ants.acs_flag) {
-	    Ants.number_of_ants = 10;
+	    Ants.n_ants = 10;
 	    Ants.rho = 0.1;
 	    Ants.q_0 = 0.98;
 	} else if (Ants.eas_flag) {
-	    Ants.elitist_ants = Ants.number_of_ants;
+	    Ants.elitist_ants = Ants.n_ants;
 	}
     }
 
@@ -355,7 +361,7 @@ public class InOut {
 	LocalSearch.ls_flag = 3; /* per default run 3-opt */
 	LocalSearch.dlb_flag = true; /* apply don't look bits in local search */
 	LocalSearch.nn_ls = 20; /* use fixed radius search in the 20 nearest neighbours */
-	Ants.number_of_ants = 25; /* number of ants */
+	Ants.n_ants = 25; /* number of ants */
 	Ants.nn_ants = 20; /* number of nearest neighbours in tour construction */
 	Ants.alpha = 1.0;
 	Ants.beta = 2.0;
@@ -392,26 +398,25 @@ public class InOut {
 	int[] l;
 	double pop_mean, pop_stddev, avg_distance = 0.0;
 
-	l = new int[Ants.number_of_ants];
-	for (k = 0; k < Ants.number_of_ants; k++) {
-	    l[k] = Ants.ant_colony[k].tour_length;
+	l = new int[Ants.n_ants];
+	for (k = 0; k < Ants.n_ants; k++) {
+	    l[k] = Ants.ant[k].tour_length;
 	}
 
-	pop_mean = Utilities.mean(l, Ants.number_of_ants);
-	pop_stddev = Utilities.std_deviation(l, Ants.number_of_ants, pop_mean);
+	pop_mean = Utilities.mean(l, Ants.n_ants);
+	pop_stddev = Utilities.std_deviation(l, Ants.n_ants, pop_mean);
 	branching_factor = node_branching(lambda);
 
-	for (k = 0; k < Ants.number_of_ants - 1; k++)
-	    for (j = k + 1; j < Ants.number_of_ants; j++) {
-		avg_distance += (double) Ants.distance_between_ants(Ants.ant_colony[k], Ants.ant_colony[j]);
+	for (k = 0; k < Ants.n_ants - 1; k++)
+	    for (j = k + 1; j < Ants.n_ants; j++) {
+		avg_distance += (double) Ants.distance_between_ants(Ants.ant[k], Ants.ant[j]);
 	    }
-	avg_distance /= ((double) Ants.number_of_ants * (double) (Ants.number_of_ants - 1) / 2.);
+	avg_distance /= ((double) Ants.n_ants * (double) (Ants.n_ants - 1) / 2.);
 
 	if (stat_report != null) {
-	    printToFile(stat_report, iteration_counter + "\t" + pop_mean + "\t" + pop_stddev + "\t" + pop_stddev + "\t"
-		    + pop_mean + "\t" + branching_factor + "\t" + (branching_factor - 1.)
-		    * (double) Tsp.number_of_cities + "\t" + avg_distance + "\t" + avg_distance
-		    / (double) Tsp.number_of_cities);
+	    printToFile(stat_report, iteration + "\t" + pop_mean + "\t" + pop_stddev + "\t" + pop_stddev + "\t"
+		    + pop_mean + "\t" + branching_factor + "\t" + (branching_factor - 1.) * (double) Tsp.n + "\t"
+		    + avg_distance + "\t" + avg_distance / (double) Tsp.n);
 	}
     }
 
@@ -430,9 +435,9 @@ public class InOut {
 	double avg;
 	double[] num_branches;
 
-	num_branches = new double[Tsp.number_of_cities];
+	num_branches = new double[Tsp.n];
 
-	for (m = 0; m < Tsp.number_of_cities; m++) {
+	for (m = 0; m < Tsp.n; m++) {
 	    /* determine max, min to calculate the cutoff value */
 	    min = Ants.pheromone[m][Tsp.instance.nn_list[m][1]];
 	    max = Ants.pheromone[m][Tsp.instance.nn_list[m][1]];
@@ -450,11 +455,11 @@ public class InOut {
 	    }
 	}
 	avg = 0.;
-	for (m = 0; m < Tsp.number_of_cities; m++) {
+	for (m = 0; m < Tsp.n; m++) {
 	    avg += num_branches[m];
 	}
 	/* Norm branching factor to minimal value 1 */
-	return (avg / (double) (Tsp.number_of_cities * 2));
+	return (avg / (double) (Tsp.n * 2));
     }
 
     static void output_solution()
@@ -468,7 +473,7 @@ public class InOut {
 
 	int i;
 	if (stat_report != null) {
-	    for (i = 0; i < Tsp.number_of_cities; i++) {
+	    for (i = 0; i < Tsp.n; i++) {
 		printToFile(stat_report, Ants.best_so_far_ant.tour[i] + " "
 			+ Tsp.instance.nodeptr[Ants.best_so_far_ant.tour[i]].x + " "
 			+ Tsp.instance.nodeptr[Ants.best_so_far_ant.tour[i]].y);
@@ -485,30 +490,29 @@ public class InOut {
      * COMMENTS:
      */
     {
-	// TODO
-	// checkTour(Ants.best_so_far_ant.tour);
-	// /* printTourFile( best_so_far_ant.tour ); */
-	//
-	// System.out.println("\n Best Solution in try %ld is %ld\n", ntry, best_so_far_ant.tour_length);
-	// if (report != null)
-	// printToFile(report, "Best: %ld\t Iterations: %6ld\t B-Fac %.5f\t Time %.2f\t Tot.time %.2f\n",
-	// best_so_far_ant.tour_length, found_best, found_branching, time_used,
-	// elapsed_time(VUtilities.IRTUAL));
-	// System.out.println(" Best Solution was found after " + found_best + " iterations\n");
-	//
-	// best_in_try[ntry] = best_so_far_ant.tour_length;
-	// best_found_at[ntry] = found_best;
-	// time_best_found[ntry] = time_used;
-	// time_total_run[ntry] = elapsed_time(VUtilities.IRTUAL);
-	// System.out.println("\ntry %ld, Best %ld, found at iteration %ld, found at time %f\n", ntry,
-	// best_in_try[ntry],
-	// best_found_at[ntry], time_best_found[ntry]);
-	//
-	// if (comp_report != null)
-	// printToFile(comp_report, "end try %ld\n\n", ntry);
-	// if (stat_report != null)
-	// printToFile(stat_report, "end try %ld\n\n", ntry);
-	// // TRACE (output_solution();)
+	checkTour(Ants.best_so_far_ant.tour);
+	/* printTourFile( best_so_far_ant.tour ); */
+
+	System.out.println("Best Solution in try " + ntry + " is " + Ants.best_so_far_ant.tour_length);
+
+	if (report != null)
+	    printToFile(report, "Best: " + Ants.best_so_far_ant.tour_length + "\t Iterations: " + found_best
+		    + "\t B-Fac " + found_branching + "\t Time " + time_used + "\t Tot.time " + Timer.elapsed_time());
+	System.out.println(" Best Solution was found after " + found_best + " iterations\n");
+
+	best_in_try[ntry] = Ants.best_so_far_ant.tour_length;
+	best_found_at[ntry] = found_best;
+	time_best_found[ntry] = time_used;
+	time_total_run[ntry] = Timer.elapsed_time();
+
+	System.out.println("\ntry " + ntry + ", Best " + best_in_try[ntry] + ", found at iteration "
+		+ best_found_at[ntry] + ", found at time " + time_best_found[ntry] + "\n");
+
+	if (comp_report != null)
+	    printToFile(comp_report, "end try " + ntry + "\n");
+	if (stat_report != null)
+	    printToFile(stat_report, "end try " + ntry + "\n");
+	// TRACE (output_solution();)
 
     }
 
@@ -542,25 +546,29 @@ public class InOut {
 	t_stdtotal = Utilities.std_deviationr(time_total_run, max_tries, t_avgtotal);
 
 	if (report != null) {
-	    // TODO
-	    // printToFile(report, "\nAverage-Best: %.2f\t Average-Iterations: %.2f", avg_sol_quality,
-	    // avg_cyc_to_bst);
-	    // printToFile(report, "\nStddev-Best: %.2f \t Stddev Iterations: %.2f", stddev_best, stddev_iterations);
-	    // printToFile(report, "\nBest try: %ld\t\t Worst try: %ld\n", best_tour_length, worst_tour_length);
-	    // printToFile(report, "\nAvg.time-best: %.2f stddev.time-best: %.2f\n", t_avgbest, t_stdbest);
-	    // printToFile(report, "\nAvg.time-Ants.total: %.2f stddev.time-Ants.total: %.2f\n", t_avgtotal,
-	    // t_stdtotal);
-	    //
-	    // if (optimal > 0) {
-	    // printToFile(report, " excess best = %f, excess average = %f, excess worst = %f\n",
-	    // (double) (best_tour_length - optimal) / (double) optimal, (double) (avg_sol_quality - optimal)
-	    // / (double) optimal, (double) (worst_tour_length - optimal) / (double) optimal);
-	    // }
+	    printToFile(report, "\nAverage-Best: " + avg_sol_quality + "\t Average-Iterations: " + avg_cyc_to_bst);
+	    printToFile(report, "\nStddev-Best: " + stddev_best + " \t Stddev Iterations: " + stddev_iterations);
+	    printToFile(report, "\nBest try: " + best_tour_length + "\t\t Worst try: " + worst_tour_length);
+	    printToFile(report, "\nAvg.time-best: " + t_avgbest + " stddev.time-best: " + t_stdbest);
+	    printToFile(report, "\nAvg.time-Ants.total: " + t_avgtotal + " stddev.time-Ants.total: " + t_stdtotal);
+
+	    if (optimal > 0) {
+		printToFile(report, " excess best = " + ((double) (best_tour_length - optimal) / (double) optimal)
+			+ ", excess average = " + ((double) (avg_sol_quality - optimal) / (double) optimal) + ","
+			+ " excess worst = " + ((double) (worst_tour_length - optimal) / (double) optimal));
+	    }
 	}
 
-	// TODO
-	// if (comp_report != null)
-	// printToFile(comp_report, "end problem %s\n", Tsp.instance.name);
+	if (comp_report != null)
+	    printToFile(comp_report, "end problem " + Tsp.instance.name);
+
+	for (String key : writer.keySet()) {
+	    try {
+		writer.get(key).close();
+	    } catch (IOException e) {
+		System.err.println("Could not close file " + key + " " + e.getMessage());
+	    }
+	}
     }
 
     static void init_program(String[] args)
@@ -597,34 +605,47 @@ public class InOut {
 
 	// TRACE ( System.out.println("\n .. done\n\n"); )
 
-	if (Ants.number_of_ants < 0)
-	    Ants.number_of_ants = Tsp.number_of_cities;
+	if (Ants.n_ants < 0)
+	    Ants.n_ants = Tsp.n;
 	/*
 	 * default setting for Ants.elitist_ants is 0; if EAS is applied and
 	 * option Ants.elitist_ants is not used, we set the default to
 	 * Ants.elitist_ants = n
 	 */
 	if (Ants.eas_flag && Ants.elitist_ants <= 0)
-	    Ants.elitist_ants = Tsp.number_of_cities;
+	    Ants.elitist_ants = Tsp.n;
 
-	LocalSearch.nn_ls = Math.min(Tsp.number_of_cities - 1, LocalSearch.nn_ls);
+	LocalSearch.nn_ls = Math.min(Tsp.n - 1, LocalSearch.nn_ls);
 
-	assert (Ants.number_of_ants < Ants.MAX_ANTS - 1);
+	assert (Ants.n_ants < Ants.MAX_ANTS - 1);
 	assert (Ants.nn_ants < Ants.MAX_NEIGHBOURS);
 	assert (Ants.nn_ants > 0);
 	assert (LocalSearch.nn_ls > 0);
 
 	if (!quiet_flag) {
-	    // TODO
-	    // sSystem.out.println(temp_buffer, "best.%s", Tsp.instance.name);
-	    // // TRACE ( System.out.println("%s\n",temp_buffer); )
-	    // report = fopen(temp_buffer, "w");
-	    // sSystem.out.println(temp_buffer, "cmp.%s", Tsp.instance.name);
-	    // // TRACE ( System.out.println("%s\n",temp_buffer); )
-	    // comp_report = fopen(temp_buffer, "w");
-	    // sSystem.out.println(temp_buffer, "stat.%s", Tsp.instance.name);
-	    // // TRACE ( System.out.println("%s\n",temp_buffer); )
-	    // stat_report = fopen(temp_buffer, "w");
+	    Writer w;
+	    try {
+		temp_buffer = "best." + Tsp.instance.name;
+		// // TRACE ( System.out.println("%s\n",temp_buffer); )
+		report = new File(temp_buffer);
+		w = new OutputStreamWriter(new FileOutputStream(temp_buffer), "UTF8");
+		writer.put(report.getName(), new BufferedWriter(w));
+
+		temp_buffer = "cmp." + Tsp.instance.name;
+		// // TRACE ( System.out.println("%s\n",temp_buffer); )
+		comp_report = new File(temp_buffer);
+		w = new OutputStreamWriter(new FileOutputStream(temp_buffer), "UTF8");
+		writer.put(comp_report.getName(), new BufferedWriter(w));
+
+		temp_buffer = "stat." + Tsp.instance.name;
+		// // TRACE ( System.out.println("%s\n",temp_buffer); )
+		stat_report = new File(temp_buffer);
+		w = new OutputStreamWriter(new FileOutputStream(temp_buffer), "UTF8");
+		writer.put(stat_report.getName(), new BufferedWriter(w));
+	    } catch (IOException e) {
+		System.err.println("Could not write file. " + e.getMessage());
+		System.exit(1);
+	    }
 	} else {
 	    report = null;
 	    comp_report = null;
@@ -635,9 +656,9 @@ public class InOut {
 	Tsp.instance.distance = Tsp.compute_distances();
 	System.out.println(" .. done\n");
 	write_params();
-	// TODO
-	// if (comp_report!=null)
-	// printToFile(comp_report, "begin problem %s\n", name_buf);
+
+	if (comp_report != null)
+	    printToFile(comp_report, "begin problem " + name_buf);
 	System.out.println("allocate ants' memory ..\n\n");
 	Ants.allocate_ants();
 	System.out.println(" .. done\n");
@@ -653,12 +674,12 @@ public class InOut {
 	int i, j;
 
 	System.out.println("Distance Matrix:\n");
-	for (i = 0; i < Tsp.number_of_cities; i++) {
+	for (i = 0; i < Tsp.n; i++) {
 	    System.out.println("From " + i);
-	    for (j = 0; j < Tsp.number_of_cities - 1; j++) {
+	    for (j = 0; j < Tsp.n - 1; j++) {
 		System.out.println(" " + Tsp.instance.distance[i][j]);
 	    }
-	    System.out.println(" " + Tsp.instance.distance[i][Tsp.number_of_cities - 1]);
+	    System.out.println(" " + Tsp.instance.distance[i][Tsp.n - 1]);
 	    System.out.println("\n");
 	}
 	System.out.println("\n");
@@ -674,9 +695,9 @@ public class InOut {
 	int i, j;
 
 	System.out.println("Heuristic information:\n");
-	for (i = 0; i < Tsp.number_of_cities; i++) {
+	for (i = 0; i < Tsp.n; i++) {
 	    System.out.println("From " + i + ":  ");
-	    for (j = 0; j < Tsp.number_of_cities - 1; j++) {
+	    for (j = 0; j < Tsp.n - 1; j++) {
 		System.out.println(" " + Ants.HEURISTIC(i, j));
 	    }
 	    System.out.println(" " + Ants.HEURISTIC(i, j));
@@ -692,20 +713,19 @@ public class InOut {
      * OUTPUT: none
      */
     {
-	// TODO
-	// int i, j;
-	//
-	// System.out.println("Ants.pheromone Trail matrix, iteration: %ld\n\n", iteration_counter);
-	// for (i = 0; i < Tsp.number_of_cities; i++) {
-	// System.out.println("From %ld:  ", i);
-	// for (j = 0; j < Tsp.number_of_cities; j++) {
-	// System.out.println(" %.10f ", Ants.pheromone[i][j]);
-	// if (Ants.pheromone[i][j] > 1.0)
-	// System.out.println("XXXXX\n");
-	// }
-	// System.out.println("\n");
-	// }
-	// System.out.println("\n");
+	int i, j;
+
+	System.out.println("Ants.pheromone Trail matrix, iteration: " + iteration + "\n");
+	for (i = 0; i < Tsp.n; i++) {
+	    System.out.println("From " + i + ": ");
+	    for (j = 0; j < Tsp.n; j++) {
+		System.out.println(" " + Ants.pheromone[i][j] + " ");
+		if (Ants.pheromone[i][j] > 1.0)
+		    System.out.println("XXXXX\n");
+	    }
+	    System.out.println("\n");
+	}
+	System.out.println("\n");
     }
 
     static void printTotal()
@@ -718,14 +738,14 @@ public class InOut {
 	int i, j;
 
 	System.out.println("combined Ants.pheromone and heuristic info\n\n");
-	for (i = 0; i < Tsp.number_of_cities; i++) {
-	    for (j = 0; j < Tsp.number_of_cities - 1; j++) {
+	for (i = 0; i < Tsp.n; i++) {
+	    for (j = 0; j < Tsp.n - 1; j++) {
 		System.out.println(" " + Ants.total[i][j]);
 		if (Ants.total[i][j] > 1.0)
 		    System.out.println("XXXXX\n");
 	    }
-	    System.out.println(" " + Ants.total[i][Tsp.number_of_cities - 1]);
-	    if (Ants.total[i][Tsp.number_of_cities - 1] > 1.0)
+	    System.out.println(" " + Ants.total[i][Tsp.n - 1]);
+	    if (Ants.total[i][Tsp.n - 1] > 1.0)
 		System.out.println("XXXXX\n");
 	}
 	System.out.println("\n");
@@ -743,26 +763,26 @@ public class InOut {
 	double p[];
 	double sum_prob;
 
-	System.out.println("Selection Probabilities, iteration: " + iteration_counter);
-	p = new double[Tsp.number_of_cities];
+	System.out.println("Selection Probabilities, iteration: " + iteration);
+	p = new double[Tsp.n];
 
-	for (i = 0; i < Tsp.number_of_cities; i++) {
+	for (i = 0; i < Tsp.n; i++) {
 	    System.out.println("From " + i);
 	    sum_prob = 0.;
-	    for (j = 0; j < Tsp.number_of_cities; j++) {
+	    for (j = 0; j < Tsp.n; j++) {
 		if (i == j)
 		    p[j] = 0.;
 		else
 		    p[j] = Ants.total[i][j];
 		sum_prob += p[j];
 	    }
-	    for (j = 0; j < Tsp.number_of_cities; j++) {
+	    for (j = 0; j < Tsp.n; j++) {
 		p[j] = p[j] / sum_prob;
 	    }
-	    for (j = 0; j < Tsp.number_of_cities - 1; j++) {
+	    for (j = 0; j < Tsp.n - 1; j++) {
 		System.out.println(" " + p[j] + " ");
 	    }
-	    System.out.println(" " + p[Tsp.number_of_cities - 1]);
+	    System.out.println(" " + p[Tsp.n - 1]);
 	    if ((j % 26) == 0) {
 		System.out.println("\n");
 	    }
@@ -781,7 +801,7 @@ public class InOut {
 	int i;
 
 	System.out.println("\n");
-	for (i = 0; i <= Tsp.number_of_cities; i++) {
+	for (i = 0; i <= Tsp.n; i++) {
 	    if (i % 25 == 0)
 		System.out.println("\n");
 	    System.out.println(t[i]);
@@ -802,7 +822,7 @@ public class InOut {
 	    return;
 
 	printToFile(comp_report, "begin solution\n");
-	for (i = 0; i < Tsp.number_of_cities; i++) {
+	for (i = 0; i < Tsp.n; i++) {
 	    printToFile(comp_report, t[i] + " ");
 	}
 	printToFile(comp_report, "\n");
@@ -819,10 +839,10 @@ public class InOut {
     {
 	int i, sum = 0;
 
-	for (i = 0; i < Tsp.number_of_cities; i++) {
+	for (i = 0; i < Tsp.n; i++) {
 	    sum += t[i];
 	}
-	if (sum != (Tsp.number_of_cities - 1) * Tsp.number_of_cities / 2) {
+	if (sum != (Tsp.n - 1) * Tsp.n / 2) {
 	    System.err.println("Next tour must be flawed !!\n");
 	    printTour(t);
 	    System.exit(1);
@@ -838,8 +858,7 @@ public class InOut {
      */
     {
 	System.out.println("\nParameter-settings: \n\n");
-	// TODO
-	// fprintf_parameters(stdout);
+	fprintf_parameters(null);
 	System.out.println("\n");
 
 	if (report != null) {
@@ -857,7 +876,15 @@ public class InOut {
     }
 
     static void printToFile(File file, String string) {
-	// TODO
+	if (file == null) {
+	    System.out.println(string);
+	} else {
+	    try {
+		writer.get(file.getName()).write(string);
+	    } catch (IOException e) {
+		System.err.print("Could not write file " + file.getName() + " " + e.getMessage());
+		System.exit(1);
+	    }
+	}
     }
-
 }

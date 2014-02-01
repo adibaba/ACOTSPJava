@@ -61,14 +61,14 @@ public class Tsp {
 	String name; /* instance name */
 	String edge_weight_type; /* selfexplanatory */
 	int optimum; /* optimal tour length if known, otherwise a bound */
-	int number_of_cities; /* number of cities */
+	int n; /* number of cities */
 	int n_near; /* number of nearest neighbors */
 	point[] nodeptr; /* array of structs containing coordinates of nodes */
 	int[][] distance; /* distance matrix: distance[i][j] gives distance */
 	int[][] nn_list; /* nearest neighbor list; contains for each node i a sorted list of n_near nearest neighbors */
     }
 
-    static int number_of_cities; /* number of cities in the instance to be solved */
+    static int n; /* number of cities in the instance to be solved */
 
     static problem instance;
 
@@ -189,16 +189,9 @@ public class Tsp {
      */
     {
 	int i, j;
-	int matrix[][] = new int[number_of_cities + 1][number_of_cities + 1];
-	// TODO
-	// if((matrix = malloc(sizeof(int ) * number_of_cities * number_of_cities +
-	// sizeof(int []) * number_of_cities )) == NULL){
-	// System.out.println(stderr,"Out of memory, exit.");
-	// exit(1);
-	// }
-	for (i = 0; i < number_of_cities; i++) {
-	    // TODO matrix[i] = (int [])(matrix + number_of_cities) + i*number_of_cities;
-	    for (j = 0; j < number_of_cities; j++) {
+	int matrix[][] = new int[n][n];
+	for (i = 0; i < n; i++) {
+	    for (j = 0; j < n; j++) {
 		if (InOut.distance_type == Distance_type.ATT) {
 		    matrix[i][j] = att_distance(i, j);
 		} else if (InOut.distance_type == Distance_type.CEIL_2D) {
@@ -221,30 +214,29 @@ public class Tsp {
      */
     {
 	int i, node, nn;
-	int[] distance_vector = new int[number_of_cities];
-	int[] help_vector = new int[number_of_cities];
+	int[] distance_vector = new int[n];
+	int[] help_vector = new int[n];
 
 	// TRACE ( System.out.println("\n computing nearest neighbor lists, "); )
 
 	nn = Math.max(LocalSearch.nn_ls, Ants.nn_ants);
-	if (nn >= number_of_cities)
-	    nn = number_of_cities - 1;
+	if (nn >= n)
+	    nn = n - 1;
 
-	int[][] m_nnear = new int[number_of_cities][nn + 1];
+	int[][] m_nnear = new int[n][nn];
 
-	// DEBUG ( assert( number_of_cities > nn ); )
+	// DEBUG ( assert( n > nn ); )
 
 	// TRACE ( System.out.println("nn = %ld ... \n",nn); )
 
-	for (node = 0; node < number_of_cities; node++) { /* compute cnd-sets for all node */
-	    // TODO m_nnear[node] = (int [])(m_nnear + number_of_cities) + node * nn;
+	for (node = 0; node < n; node++) { /* compute cnd-sets for all node */
 
-	    for (i = 0; i < number_of_cities; i++) { /* Copy distances from nodes to the others */
+	    for (i = 0; i < n; i++) { /* Copy distances from nodes to the others */
 		distance_vector[i] = instance.distance[node][i];
 		help_vector[i] = i;
 	    }
 	    distance_vector[node] = Integer.MAX_VALUE; /* city is not nearest neighbour */
-	    Utilities.sort2(distance_vector, help_vector, 0, number_of_cities - 1);
+	    Utilities.sort2(distance_vector, help_vector, 0, n - 1);
 	    for (i = 0; i < nn; i++) {
 		m_nnear[node][i] = help_vector[i];
 	    }
@@ -264,7 +256,7 @@ public class Tsp {
 	int i;
 	int tour_length = 0;
 
-	for (i = 0; i < number_of_cities; i++) {
+	for (i = 0; i < n; i++) {
 	    tour_length += instance.distance[t[i]][t[i + 1]];
 	}
 	return tour_length;
@@ -274,8 +266,8 @@ public class Tsp {
 	boolean error = false;
 
 	int i;
-	int[] used = new int[number_of_cities];
-	int size = number_of_cities;
+	int[] used = new int[n];
+	int size = n;
 
 	if (t == null) {
 	    System.err.println("error: permutation is not initialized!");

@@ -198,7 +198,6 @@ public class Parse {
 	    System.out.println("-u/as is set, run basic Ant System");
 	}
 	if (cmd.hasOption("v")) {
-	    // TODO Missing in ACOTSP v1.02 C code?
 	    Ants.eas_flag = true;
 	    InOut.set_default_eas_parameters();
 	    System.out.println("-v/eas is set, run Elitist Ant System");
@@ -209,8 +208,6 @@ public class Parse {
 	    System.out.println("-w/ras is set, run Rank-based Ant System");
 	}
 	if (cmd.hasOption("x") || algorithmCount == 0) {
-	    // Is default in ACOTSP set_default_parameters()
-	    // TODO is number of ants in ACOTSP v1.02 C code set correct?
 	    Ants.mmas_flag = true;
 	    InOut.set_default_mmas_parameters();
 	    System.out.println("-x/mmas is set, run MAX-MIN Ant System");
@@ -253,10 +250,10 @@ public class Parse {
 	}
 
 	if (cmd.hasOption("m")) {
-	    Ants.number_of_ants = Integer.parseInt(cmd.getOptionValue("m"));
-	    System.out.println("-m/ants Number of ants with argument " + Ants.number_of_ants);
+	    Ants.n_ants = Integer.parseInt(cmd.getOptionValue("m"));
+	    System.out.println("-m/ants Number of ants with argument " + Ants.n_ants);
 	} else {
-	    System.out.println("Note: Number of ants is set to default " + Ants.number_of_ants);
+	    System.out.println("Note: Number of ants is set to default " + Ants.n_ants);
 	}
 
 	if (cmd.hasOption("a")) {
