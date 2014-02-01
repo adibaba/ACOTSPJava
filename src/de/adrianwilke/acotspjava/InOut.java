@@ -226,21 +226,21 @@ public class InOut {
 	printToFile(file, "Utilities.seed\t\t " + Utilities.seed);
 	printToFile(file, "optimum\t\t\t " + optimal);
 	printToFile(file, "n_ants\t\t\t " + Ants.n_ants);
-	printToFile(file, "Ants.nn_ants\t\t\t " + Ants.nn_ants);
-	printToFile(file, "Ants.alpha\t\t\t " + Ants.alpha);
-	printToFile(file, "Ants.beta\t\t\t " + Ants.beta);
-	printToFile(file, "Ants.rho\t\t\t " + Ants.rho);
-	printToFile(file, "Ants.q_0\t\t\t " + Ants.q_0);
-	printToFile(file, "Ants.elitist_ants\t\t " + Ants.elitist_ants);
+	printToFile(file, "Ants.nn_ants\t\t " + Ants.nn_ants);
+	printToFile(file, "Ants.alpha\t\t " + Ants.alpha);
+	printToFile(file, "Ants.beta\t\t " + Ants.beta);
+	printToFile(file, "Ants.rho\t\t " + Ants.rho);
+	printToFile(file, "Ants.q_0\t\t " + Ants.q_0);
+	printToFile(file, "Ants.elitist_ants\t " + Ants.elitist_ants);
 	printToFile(file, "Ants.ras_ranks\t\t " + Ants.ras_ranks);
-	printToFile(file, "LocalSearch.ls_flag\t\t\t " + LocalSearch.ls_flag);
-	printToFile(file, "LocalSearch.nn_ls\t\t\t " + LocalSearch.nn_ls);
-	printToFile(file, "LocalSearch.dlb_flag\t\t " + LocalSearch.dlb_flag);
-	printToFile(file, "Ants.as_flag\t\t\t " + Ants.as_flag);
-	printToFile(file, "Ants.eAnts.as_flag\t\t " + Ants.eas_flag);
+	printToFile(file, "LocalSearch.ls_flag\t " + LocalSearch.ls_flag);
+	printToFile(file, "LocalSearch.nn_ls\t " + LocalSearch.nn_ls);
+	printToFile(file, "LocalSearch.dlb_flag\t " + LocalSearch.dlb_flag);
+	printToFile(file, "Ants.as_flag\t\t " + Ants.as_flag);
+	printToFile(file, "Ants.eAnts.as_flag\t " + Ants.eas_flag);
 	printToFile(file, "rAnts.as_flag\t\t " + Ants.ras_flag);
 	printToFile(file, "mmAnts.as_flag\t\t " + Ants.mmas_flag);
-	printToFile(file, "Ants.bwAnts.as_flag\t\t " + Ants.bwas_flag);
+	printToFile(file, "Ants.bwAnts.as_flag\t " + Ants.bwas_flag);
 	printToFile(file, "Ants.acs_flag\t\t " + Ants.acs_flag);
     }
 
@@ -880,7 +880,7 @@ public class InOut {
 
     static void printToFile(File file, String string) {
 	if (file == null) {
-	    System.out.println(string);
+	    System.out.println(string + "\n");
 	} else {
 	    try {
 		writer.get(file.getName()).write(string);
