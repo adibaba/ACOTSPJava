@@ -49,9 +49,12 @@ local.properties
 
 # ACOTSPJava
 
+<<<<<<< HEAD
 .classpath
 .project
 
+=======
+>>>>>>> 9d3fa5d5d5111638f5cdc52394f08470415dd795
 best.*
 cmp.*
 stat.*
