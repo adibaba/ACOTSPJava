@@ -10,12 +10,6 @@ package de.adrianwilke.acotspjava;
  * Source code: https://github.com/adibaba/ACOTSPJava/
  */
 public class Ants {
-    static class ant_struct {
-	int[] tour;
-	boolean[] visited;
-	int tour_length;
-    }
-
     /*
      * ################################################
      * ########## ACO algorithms for the TSP ##########
@@ -58,6 +52,12 @@ public class Ants {
      * D-64283 Darmstadt
      * Germany
      ***************************************************************************/
+
+    static class ant_struct {
+	int[] tour;
+	boolean[] visited;
+	int tour_length;
+    }
 
     public static final int MAX_ANTS = 1024;
     public static final int MAX_NEIGHBOURS = 512;

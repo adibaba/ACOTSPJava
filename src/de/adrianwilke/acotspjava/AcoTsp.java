@@ -91,7 +91,7 @@ public class AcoTsp {
 	    step++;
 	    for (k = 0; k < Ants.n_ants; k++) {
 		Ants.neighbour_choose_and_move_to_next(Ants.ant[k], step);
-		if (!Ants.acs_flag)
+		if (Ants.acs_flag)
 		    Ants.local_acs_pheromone_update(Ants.ant[k], step);
 	    }
 	}
