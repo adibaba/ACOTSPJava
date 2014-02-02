@@ -100,7 +100,7 @@ public class AcoTsp {
 	for (k = 0; k < Ants.n_ants; k++) {
 	    Ants.ant[k].tour[Tsp.n] = Ants.ant[k].tour[0];
 	    Ants.ant[k].tour_length = Tsp.compute_tour_length(Ants.ant[k].tour);
-	    if (!Ants.acs_flag)
+	    if (Ants.acs_flag)
 		Ants.local_acs_pheromone_update(Ants.ant[k], step);
 	}
 	InOut.n_tours += Ants.n_ants;
