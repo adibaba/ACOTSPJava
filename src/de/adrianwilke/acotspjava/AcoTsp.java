@@ -238,7 +238,7 @@ public class AcoTsp {
 	    InOut.found_branching = InOut.node_branching(InOut.lambda);
 	    InOut.branching_factor = InOut.found_branching;
 	    if (Ants.mmas_flag) {
-		if (LocalSearch.ls_flag != 0) {
+		if (LocalSearch.ls_flag == 0) {
 		    p_x = Math.exp(Math.log(0.05) / Tsp.n);
 		    Ants.trail_min = 1. * (1. - p_x) / (p_x * (double) ((Ants.nn_ants + 1) / 2));
 		    Ants.trail_max = 1. / ((Ants.rho) * Ants.best_so_far_ant.tour_length);
