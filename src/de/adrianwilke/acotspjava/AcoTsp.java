@@ -553,7 +553,7 @@ public class AcoTsp {
 	Ants.total = Utilities.generate_double_matrix(Tsp.n, Tsp.n);
 
 	InOut.time_used = Timer.elapsed_time();
-	System.out.println("Initialization took " + InOut.time_used + " seconds");
+	System.out.println("Initialization took " + InOut.time_used + " seconds\n");
 
 	for (InOut.n_try = 0; InOut.n_try < InOut.max_tries; InOut.n_try++) {
 

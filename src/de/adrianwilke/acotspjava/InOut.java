@@ -74,7 +74,7 @@ public class InOut {
 
     static Distance_type distance_type;
 
-    public static final String PROG_ID_STR = "ACO algorithms for the TSP, v1.02";
+    public static final String PROG_ID_STR = "ACO algorithms for the TSP";
 
     static int[] best_in_try;
     static int[] best_found_at;
@@ -136,7 +136,7 @@ public class InOut {
 	    System.exit(1);
 	}
 
-	System.out.println("reading tsp-file " + tsp_file_name + " ... ");
+	System.out.println("\nreading tsp-file " + tsp_file_name + " ... ");
 
 	i = 0;
 	boolean found_coord_section = false;
@@ -201,6 +201,8 @@ public class InOut {
 
 	// TRACE ( System.out.println("number of cities is %ld\n",Tsp.n); )
 	// TRACE ( System.out.println("\n... done\n"); )
+	System.out.println();
+
 	return (nodeptr);
     }
 
@@ -417,9 +419,9 @@ public class InOut {
 	avg_distance /= ((double) Ants.n_ants * (double) (Ants.n_ants - 1) / 2.);
 
 	if (stat_report != null) {
-	    printToFile(stat_report, iteration + "\t" + pop_mean + "\t" + pop_stddev + "\t" + pop_stddev + "\t"
-		    + pop_mean + "\t" + branching_factor + "\t" + (branching_factor - 1.) * (double) Tsp.n + "\t"
-		    + avg_distance + "\t" + avg_distance / (double) Tsp.n);
+	    printToFile(stat_report, iteration + "\t" + pop_mean + "\t" + pop_stddev + "\t" + (pop_stddev / pop_mean)
+		    + "\t" + branching_factor + "\t" + ((branching_factor - 1.) * (double) Tsp.n) + "\t" + avg_distance
+		    + "\t" + (avg_distance / (double) Tsp.n));
 	}
     }
 
@@ -550,8 +552,8 @@ public class InOut {
 
 	if (report != null) {
 	    printToFile(report, "\nAverage-Best: " + avg_sol_quality + "\t Average-Iterations: " + avg_cyc_to_bst);
-	    printToFile(report, "\nStddev-Best: " + stddev_best + " \t Stddev Iterations: " + stddev_iterations);
-	    printToFile(report, "\nBest try: " + best_tour_length + "\t\t Worst try: " + worst_tour_length);
+	    printToFile(report, "Stddev-Best: " + stddev_best + " \t Stddev Iterations: " + stddev_iterations);
+	    printToFile(report, "Best try: " + best_tour_length + "\t\t Worst try: " + worst_tour_length);
 	    printToFile(report, "\nAvg.time-best: " + t_avgbest + " stddev.time-best: " + t_stdbest);
 	    printToFile(report, "\nAvg.time-Ants.total: " + t_avgtotal + " stddev.time-Ants.total: " + t_stdtotal);
 
@@ -655,14 +657,14 @@ public class InOut {
 	    stat_report = null;
 	}
 
-	System.out.println("calculating distance matrix ..\n\n");
+	System.out.println("calculating distance matrix ..");
 	Tsp.instance.distance = Tsp.compute_distances();
 	System.out.println(" .. done\n");
 	write_params();
 
 	if (comp_report != null)
 	    printToFile(comp_report, "begin problem " + name_buf);
-	System.out.println("allocate ants' memory ..\n\n");
+	System.out.println("allocate ants' memory ..");
 	Ants.allocate_ants();
 	System.out.println(" .. done\n");
     }
@@ -860,19 +862,19 @@ public class InOut {
      * OUTPUT: none
      */
     {
-	System.out.println("\nParameter-settings: \n\n");
+	System.out.println("Parameter-settings:\n");
 	fprintf_parameters(null);
 	System.out.println("\n");
 
 	if (report != null) {
-	    printToFile(report, "\nParameter-settings: \n\n");
+	    printToFile(report, "Parameter-settings: \n\n");
 	    fprintf_parameters(report);
 	    printToFile(report, "\n");
 	}
 
 	if (comp_report != null) {
 	    printToFile(comp_report, PROG_ID_STR);
-	    printToFile(comp_report, "\nParameter-settings: \n\n");
+	    printToFile(comp_report, "Parameter-settings: \n\n");
 	    fprintf_parameters(comp_report);
 	    printToFile(comp_report, "\n");
 	}
@@ -880,10 +882,10 @@ public class InOut {
 
     static void printToFile(File file, String string) {
 	if (file == null) {
-	    System.out.println(string + "\n");
+	    System.out.println(string);
 	} else {
 	    try {
-		writer.get(file.getName()).write(string);
+		writer.get(file.getName()).write(string + "\n");
 	    } catch (IOException e) {
 		System.err.print("Could not write file " + file.getName() + " " + e.getMessage());
 		System.exit(1);
