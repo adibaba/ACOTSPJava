@@ -541,7 +541,9 @@ public class AcoTsp {
 	 * (SIDE)EFFECTS: none
 	 * COMMENTS: this function controls the run of "max_tries" independent trials
 	 */
-
+	     for(String argument : args){
+	            System.out.println(argument);
+	        }      
 	Timer.start_timers();
 
 	InOut.init_program(args);

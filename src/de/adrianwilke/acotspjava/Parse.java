@@ -76,7 +76,10 @@ public class Parse {
 
 	@Override
 	public int compare(Option o1, Option o2) {
-	    return (opt.get(o1.getOpt()) - opt.get(o2.getOpt()));
+	    if (o1.getValue() == null || o2.getValue() == null)
+		return 0;
+	    else
+		return (opt.get(o1.getOpt()) - opt.get(o2.getOpt()));
 	}
     }
 
