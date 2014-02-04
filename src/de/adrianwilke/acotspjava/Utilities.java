@@ -331,4 +331,22 @@ public class Utilities {
     {
 	return new double[n][m];
     }
+
+    static int aw_best_tour_index() {
+	int min, k;
+
+	int[] values = InOut.best_in_try;
+	int l = InOut.max_tries;
+
+	k = 0;
+	min = values[k];
+	int minIndex = 0;
+	for (k = 1; k < l; k++) {
+	    if (values[k] < min) {
+		min = values[k];
+		minIndex = k;
+	    }
+	}
+	return minIndex;
+    }
 }

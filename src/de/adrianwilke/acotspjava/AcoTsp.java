@@ -1,5 +1,11 @@
 package de.adrianwilke.acotspjava;
 
+import java.io.BufferedWriter;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
+
 /**
  * ACO algorithms for the TSP
  * 
@@ -275,8 +281,8 @@ public class AcoTsp {
 	if ((InOut.iteration % 100) == 0) {
 	    InOut.population_statistics();
 	    InOut.branching_factor = InOut.node_branching(InOut.lambda);
-	    System.out.println("best so far " + Ants.best_so_far_ant.tour_length + ", iteration: "
-		    + InOut.iteration + ", time " + Timer.elapsed_time() + ", b_fac " + InOut.branching_factor);
+	    System.out.println("best so far " + Ants.best_so_far_ant.tour_length + ", iteration: " + InOut.iteration
+		    + ", time " + Timer.elapsed_time() + ", b_fac " + InOut.branching_factor);
 
 	    if (Ants.mmas_flag && (InOut.branching_factor < InOut.branch_fac)
 		    && (InOut.iteration - InOut.restart_found_best > 250)) {
@@ -442,8 +448,7 @@ public class AcoTsp {
 	    Ants.init_pheromone_trails(Ants.trail_0);
 	    InOut.restart_iteration = InOut.iteration;
 	    InOut.restart_time = Timer.elapsed_time();
-	    System.out.println("init Ants.pheromone trails with " + Ants.trail_0 + ", iteration "
-		    + InOut.iteration);
+	    System.out.println("init Ants.pheromone trails with " + Ants.trail_0 + ", iteration " + InOut.iteration);
 	} else
 	    Ants.bwas_pheromone_mutation();
     }
@@ -541,9 +546,9 @@ public class AcoTsp {
 	 * (SIDE)EFFECTS: none
 	 * COMMENTS: this function controls the run of "max_tries" independent trials
 	 */
-	     for(String argument : args){
-	            System.out.println(argument);
-	        }      
+	for (String argument : args) {
+	    System.out.println(argument);
+	}
 	Timer.start_timers();
 
 	InOut.init_program(args);
@@ -577,6 +582,23 @@ public class AcoTsp {
 	    InOut.exit_try(InOut.n_try);
 	}
 	InOut.exit_program();
-	
+
+	// Added by AW
+	int aw_best_tour_length = Utilities.best_of_vector(InOut.best_in_try, InOut.max_tries);
+	String aw_best_tour = InOut.aw_best_tour_in_try[Utilities.aw_best_tour_index()];
+	try {
+	    Writer w = new OutputStreamWriter(new FileOutputStream("tour." + Tsp.instance.name), "UTF8");
+	    BufferedWriter out = new BufferedWriter(w);
+	    out.write(aw_best_tour_length + "\n");
+	    out.write(aw_best_tour);
+	    out.close();
+	} catch (IOException e) {
+	    System.err.print("Could not write file tour." + Tsp.instance.name + " " + e.getMessage());
+	    System.exit(1);
+	}
+	System.out.println();
+	System.out.println("Best tour:");
+	System.out.println(aw_best_tour_length);
+	System.out.println(aw_best_tour);
     }
 }

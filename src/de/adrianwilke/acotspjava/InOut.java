@@ -10,6 +10,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.Writer;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -80,6 +81,7 @@ public class InOut {
     static int[] best_found_at;
     static double[] time_best_found;
     static double[] time_total_run;
+    static String[] aw_best_tour_in_try;
 
     static int n_try; /* try counter */
     static int n_tours; /* counter of number constructed tours */
@@ -509,6 +511,7 @@ public class InOut {
 	best_found_at[ntry] = found_best;
 	time_best_found[ntry] = time_used;
 	time_total_run[ntry] = Timer.elapsed_time();
+	aw_best_tour_in_try[ntry] = Arrays.toString(Ants.best_so_far_ant.tour);
 
 	System.out.println("\ntry " + ntry + ", Best " + best_in_try[ntry] + ", found at iteration "
 		+ best_found_at[ntry] + ", found at time " + time_best_found[ntry] + "\n");
@@ -598,6 +601,8 @@ public class InOut {
 	best_found_at = new int[max_tries];
 	time_best_found = new double[max_tries];
 	time_total_run = new double[max_tries];
+
+	aw_best_tour_in_try = new String[max_tries];
 
 	// TRACE ( System.out.println("read problem data  ..\n\n"); )
 

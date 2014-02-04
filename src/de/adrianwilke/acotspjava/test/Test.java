@@ -15,17 +15,17 @@ public class Test {
 
 	// System.out.println(new File("").getAbsolutePath());
 
-	// argList.add("-h");
+	argList.add("-h");
 
-	putTestParameters();
-	argList.add("-l");
-	argList.add("0");
+	// putTestParameters();
+	// argList.add("-l");
+	// argList.add("0");
 
 	// ./AcoTsp --ants 20 --time 2 --tours 2 --tries 2 -i ../../d1291.tsp -l 0 --as
 
 	// Comments: ACOTSP, ACOTSPJava
 
-	argList.add("--as");
+	// argList.add("--as");
 	// -l 0: 62571,67053
 	// -l 1: 52842,53925
 	// -l 2: 52547,53464
