@@ -119,9 +119,9 @@ public class Tsp {
     {
 	double xd = instance.nodeptr[i].x - instance.nodeptr[j].x;
 	double yd = instance.nodeptr[i].y - instance.nodeptr[j].y;
-	double r = Math.sqrt(xd * xd + yd * yd) + 0.000000001;
+	double r = Math.sqrt(xd * xd + yd * yd);
 
-	return (int) r;
+	return (int) Math.ceil(r);
     }
 
     static int geo_distance(int i, int j)

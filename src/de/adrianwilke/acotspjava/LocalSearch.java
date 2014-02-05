@@ -119,7 +119,7 @@ public class LocalSearch {
 	int pos_c1, pos_c2; /* positions of cities c1, c2 */
 	int i, j, h, l;
 	int help;
-	boolean improve_node, improvement_flag;
+	boolean improvement_flag;
 	int h1 = 0, h2 = 0, h3 = 0, h4 = 0;
 	int radius; /* radius of nn-search */
 	int gain = 0;
@@ -147,7 +147,6 @@ public class LocalSearch {
 		// DEBUG ( assert ( c1 < Tsp.n && c1 >= 0); )
 		if (dlb_flag && dlb[c1])
 		    continue;
-		improve_node = false;
 		pos_c1 = pos[c1];
 		s_c1 = tour[pos_c1 + 1];
 		radius = Tsp.instance.distance[c1][s_c1];
@@ -164,7 +163,6 @@ public class LocalSearch {
 			    h2 = s_c1;
 			    h3 = c2;
 			    h4 = s_c2;
-			    improve_node = true;
 			    gotoExchange = true;
 			    break;
 			}
@@ -198,7 +196,6 @@ public class LocalSearch {
 				h2 = c1;
 				h3 = p_c2;
 				h4 = c2;
-				improve_node = true;
 				gotoExchange = true;
 				break;
 			    }
@@ -207,7 +204,13 @@ public class LocalSearch {
 		    }
 		}
 
-		if (improve_node || gotoExchange) {
+		if (!gotoExchange) {
+		    /* No exchange */
+		    dlb[c1] = true;
+		    continue;
+		}
+
+		if (gotoExchange) {
 		    gotoExchange = false;
 		    improvement_flag = true;
 		    dlb[h1] = false;
